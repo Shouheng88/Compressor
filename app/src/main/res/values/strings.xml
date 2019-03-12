@@ -5,9 +5,13 @@
     <string name="text_compress">Compress</string>
 
     <string name="text_capture">Get from Camera</string>
-    <string name="text_choose">Choose from File System</string>
-    <string name="text_comress_by_luban">Luban</string>
-    <string name="text_comress_by_luban_callback">Luban with Callback</string>
-    <string name="text_comress_by_compressor">Compressor</string>
-    <string name="text_comress_by_compressor_callback">Compressor with Callback</string>
+    <string name="text_choose">From File System</string>
+    <string name="text_compress_region_luban">Luban</string>
+    <string name="text_launch_type">Launch Type : </string>
+    <string name="text_launch_type_launch">Launch</string>
+    <string name="text_launch_type_flowable">Flowable</string>
+    <string name="text_compress_by_luban">Compress by Luban</string>
+    <string name="text_compress_by_luban_callback">Luban with Callback</string>
+    <string name="text_compress_by_compressor">Compressor</string>
+    <string name="text_compress_by_compressor_callback">Compressor with Callback</string>
 </resources>
