@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.concurrent.Callable;
 
 /**
- * The compress algorithm by <a href="https://github.com/zetbaitsu/Compressor">Compressor<a/>.
+ * The compress algorithm by <a href="https://github.com/zetbaitsu/Compressor">Compressor</a>.
  */
 public class Compressor extends AbstractStrategy {
 

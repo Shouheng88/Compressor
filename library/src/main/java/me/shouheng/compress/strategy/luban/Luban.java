@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.concurrent.Callable;
 
 /**
- * The compress algorithm by <a href="https://github.com/Curzibn/Luban">Luban<a/>.
+ * The compress algorithm by <a href="https://github.com/Curzibn/Luban">Luban</a>.
  */
 public class Luban extends SimpleStrategy {
 

@@ -1,0 +1,11 @@
+apply plugin: 'com.novoda.bintray-release'
+
+publish {
+    userOrg = 'easymark'
+    groupId = 'me.shouheng.compressor'
+    artifactId = 'compressor'
+    repoName = 'Android'
+    publishVersion = '0.0.1'
+    desc = 'An easy to use image compress library for Android.'
+    website = 'https://github.com/Shouheng88/EasyCompressor'
+}
