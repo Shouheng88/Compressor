@@ -1,17 +1,47 @@
 <resources>
     <string name="app_name">Easy Compress</string>
 
+    <string name="text_cancel">取消</string>
+    <string name="text_confirm">确定</string>
+
     <string name="text_tips">Choose a file from the file system and compress it with different strategies.</string>
     <string name="text_compress">Compress</string>
 
     <string name="text_capture">Get from Camera</string>
     <string name="text_choose">From File System</string>
-    <string name="text_compress_region_luban">Luban</string>
+
+    <string name="text_compress_region_luban">Luban Compress Strategy Region: </string>
     <string name="text_launch_type">Launch Type : </string>
     <string name="text_launch_type_launch">Launch</string>
     <string name="text_launch_type_flowable">Flowable</string>
+    <string name="text_ignore_type">Copy when ignore : \t</string>
     <string name="text_compress_by_luban">Compress by Luban</string>
-    <string name="text_compress_by_luban_callback">Luban with Callback</string>
-    <string name="text_compress_by_compressor">Compressor</string>
-    <string name="text_compress_by_compressor_callback">Compressor with Callback</string>
+
+    <string name="text_compress_region_compressor">Compressor Compress Strategy Region: </string>
+    <string name="text_compress_scale_mode">Scale mode : </string>
+    <string name="text_compress_scale_larger">Scale Larger</string>
+    <string name="text_compress_scale_smaller">Scale Smaller</string>
+    <string name="text_compress_scale_width">Scale Width</string>
+    <string name="text_compress_scale_height">Scale Height</string>
+    <string name="text_compress_by_compressor">Compress by Compressor</string>
+
+    <string name="text_compress_region_custom">Custom Compress Strategy Region: </string>
+    <string name="text_compress_by_custom">Compress by Custom</string>
+
+    <string name="permission_set_permission_tips">打开设置的程序信息页面，轻触\"权限\"，将\"%s\"设置为打开，并再次尝试.</string>
+    <string name="permission_to_set_permission">去设置</string>
+    <string name="permission_set_permission">设置权限</string>
+    <string name="permission_storage_permission">存储空间</string>
+    <string name="permission_location_permission">位置信息</string>
+    <string name="permission_microphone_permission">麦克风</string>
+    <string name="permission_phone_permission">电话</string>
+    <string name="permission_sms_permission">短信</string>
+    <string name="permission_sensor_permission">传感器</string>
+    <string name="permission_contacts_permission">通讯录</string>
+    <string name="permission_camera_permission">相机</string>
+    <string name="permission_calendar_permission">日历</string>
+    <string name="permission_default_permission_name">权限</string>
+    <string name="permission_denied_try_again_after_set">没有权限，请授予权限之后再次尝试。</string>
+    <string name="permission_denied_try_again_after_set_given_permission">没有权限，请授予%s权限之后再次尝试。</string>
+
 </resources>

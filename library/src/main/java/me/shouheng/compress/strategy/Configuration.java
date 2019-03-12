@@ -15,11 +15,18 @@ import java.lang.annotation.RetentionPolicy;
 public final class Configuration {
 
     /**
-     * Scale according to larger side, another will change according to image width and height ratio.
+     * Scale according to larger side, another will change according to original image width/height ratio.
      * For example, if the original image (W:1000, H:500), destination (W:100, H:100), then the result
      * size will be (W:100, H:50).
      */
-    public static final int SCALE_LARGER    = 1;
+    public static final int SCALE_LARGER    = 0;
+
+    /**
+     * Scale according to smaller, another side will change according to original image width/height ratio.
+     * For example, if the original image wa (W:1000, H:500), destination (W:100, H:100), then the result
+     * size will be (W:200, H:100).
+     */
+    public static final int SCALE_SMALLER   = 1;
 
     /**
      * Scale the width, and the height will change according to the image ratio.
@@ -51,7 +58,7 @@ public final class Configuration {
 
     public static final int COMPRESSOR_DEFAULT_SCALE_MODE = SCALE_LARGER;
 
-    @IntDef({SCALE_LARGER, SCALE_WIDTH, SCALE_HEIGHT})
+    @IntDef({SCALE_LARGER, SCALE_SMALLER, SCALE_WIDTH, SCALE_HEIGHT})
     @Retention(RetentionPolicy.SOURCE)
     public @interface ScaleMode {
     }

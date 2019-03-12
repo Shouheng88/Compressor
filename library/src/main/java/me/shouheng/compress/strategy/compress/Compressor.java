@@ -48,7 +48,8 @@ public class Compressor extends AbstractStrategy {
 
     /**
      * Set the scale mode when the destination image ratio differ from the original original.
-     * Might be one of {@link me.shouheng.compress.strategy.Configuration.ScaleMode#SCALE_LARGER}.
+     * Might be one of {@link me.shouheng.compress.strategy.Configuration.ScaleMode#SCALE_LARGER},
+     * {@link me.shouheng.compress.strategy.Configuration.ScaleMode#SCALE_SMALLER},
      * {@link me.shouheng.compress.strategy.Configuration.ScaleMode#SCALE_WIDTH} or
      * {@link me.shouheng.compress.strategy.Configuration.ScaleMode#SCALE_HEIGHT}.
      *
@@ -85,6 +86,10 @@ public class Compressor extends AbstractStrategy {
         int reqHeight = calculateRequiredHeight(imgRatio, reqRatio);
 
         BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        options.inSampleSize = 1;
+        BitmapFactory.decodeFile(srcFile.getAbsolutePath(), options);
+
         options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
         options.inJustDecodeBounds = false;
         options.inDither = false;
@@ -139,6 +144,20 @@ public class Compressor extends AbstractStrategy {
                         return (int) maxWidth;
                     }
                 }
+                break;
+            }
+            case Configuration.SCALE_SMALLER: {
+                if (srcHeight > maxHeight || srcWidth > maxWidth) {
+                    // If Height is greater
+                    if (imgRatio < reqRatio) {
+                        return (int) maxWidth;
+                    }  // If Width is greater
+                    else if (imgRatio > reqRatio) {
+                        imgRatio = maxHeight / srcHeight;
+                        return (int) (imgRatio * srcWidth);
+                    }
+                }
+                break;
             }
             case Configuration.SCALE_HEIGHT: {
                 return (int) (srcWidth * maxHeight / srcHeight);
@@ -146,6 +165,8 @@ public class Compressor extends AbstractStrategy {
             case Configuration.SCALE_WIDTH: {
                 return (int) maxWidth;
             }
+            default:
+                return (int) maxWidth;
         }
         return (int) maxWidth;
     }
@@ -163,6 +184,20 @@ public class Compressor extends AbstractStrategy {
                         return (int) (imgRatio * srcHeight);
                     }
                 }
+                break;
+            }
+            case Configuration.SCALE_SMALLER: {
+                if (srcHeight > maxHeight || srcWidth > maxWidth) {
+                    // If Height is greater
+                    if (imgRatio < reqRatio) {
+                        imgRatio = maxWidth / srcWidth;
+                        return (int) (imgRatio * srcHeight);
+                    }  // If Width is greater
+                    else if (imgRatio > reqRatio) {
+                        return (int) maxHeight;
+                    }
+                }
+                break;
             }
             case Configuration.SCALE_HEIGHT: {
                 return (int) maxHeight;
@@ -171,19 +206,19 @@ public class Compressor extends AbstractStrategy {
                 imgRatio = maxWidth / srcWidth;
                 return (int) (srcHeight * imgRatio);
             }
+            default:
+                return (int) maxHeight;
         }
         return (int) maxHeight;
     }
 
-    // TODO check this method
-    private int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    protected int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;
         final int width = options.outWidth;
         int inSampleSize = 1;
 
         if (height > reqHeight || width > reqWidth) {
-            inSampleSize *= 2;
             final int halfHeight = height / 2;
             final int halfWidth = width / 2;
 
