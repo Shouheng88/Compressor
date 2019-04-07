@@ -10,6 +10,7 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
+import com.bumptech.glide.Glide
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import me.shouheng.compress.Compress
@@ -38,6 +39,16 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.activity_main, null, false)
         setContentView(binding.root)
+
+        binding.ivOriginal.setOnLongClickListener {
+            val tag = binding.ivOriginal.tag
+            if (tag != null) {
+                val filePath = tag as String
+                val file = File(filePath)
+                Glide.with(this@MainActivity).load(file).into(binding.ivResult)
+            }
+            true
+        }
 
         LogUtils.setDebug(true)
     }
@@ -121,7 +132,7 @@ class MainActivity : BaseActivity() {
                         Toast.makeText(this@MainActivity, "Compress Error ：$throwable", Toast.LENGTH_SHORT).show()
                     }
                 })
-                .setCacheNameFactory { System.currentTimeMillis().toString() }
+                .setCacheNameFactory { System.currentTimeMillis().toString() + ".jpg" }
                 .setQuality(80)
                 .strategy(Strategies.luban())
                 .setIgnoreSize(100, copy)

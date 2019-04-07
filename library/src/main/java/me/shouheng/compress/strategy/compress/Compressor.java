@@ -126,7 +126,10 @@ public class Compressor extends AbstractStrategy {
                 middleY - bmp.getHeight() / 2, new Paint(Paint.FILTER_BITMAP_FLAG));
         bmp.recycle();
 
-        rotateBitmap(scaledBitmap, ImageUtils.getImageAngle(srcFile));
+        int orientation = ImageUtils.getImageAngle(srcFile);
+        if (orientation != 0) {
+            scaledBitmap = rotateBitmap(scaledBitmap, ImageUtils.getImageAngle(srcFile));
+        }
 
         return scaledBitmap;
     }
