@@ -28,13 +28,15 @@
 
 ## 3、使用
 
-首先，在项目的 Gradle 中加入我的 Maven 仓库的地址：
+首先，在项目的 Gradle 中加入我的 jcenter仓库：
 
-    maven { url "https://dl.bintray.com/easymark/Android" }
+    repositories {
+        jcenter()
+    }
 
 然后，在你的项目的依赖中，添加该库的依赖：
 
-    implementation 'me.shouheng.compressor:compressor:0.0.1'
+    implementation 'me.shouheng.compressor:compressor:1.0.0'
 
 然后，就可以在项目中使用了。你可以参考 Sample 项目的使用方式。不过，下面我们还是对它的一些 API 做简单的说明。
 
@@ -143,6 +145,10 @@ class MySimpleStrategy: SimpleStrategy() {
 ```
 
 注意下，如果想要实现链式的调用，自定义压缩策略的方法需要返回自身。
+
+## 更新日志
+
+- 版本 1.0.0：修改了 Compressor 压缩模式图片无法旋转的问题
 
 ## License
 
