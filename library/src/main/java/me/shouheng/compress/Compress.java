@@ -7,7 +7,7 @@ import android.text.TextUtils;
 import me.shouheng.compress.listener.CompressListener;
 import me.shouheng.compress.naming.CacheNameFactory;
 import me.shouheng.compress.naming.DefaultNameFactory;
-import me.shouheng.compress.strategy.Configuration;
+import me.shouheng.compress.strategy.Config;
 import me.shouheng.compress.utils.FileUtils;
 
 import java.io.File;
@@ -27,8 +27,8 @@ public class Compress {
 
     private Context context;
     private File srcFile;
-    private Bitmap.CompressFormat format = Configuration.DEFAULT_COMPRESS_FORMAT;
-    private int quality = Configuration.DEFAULT_COMPRESS_QUALITY;
+    private Bitmap.CompressFormat format = Config.DEFAULT_COMPRESS_FORMAT;
+    private int quality = Config.DEFAULT_COMPRESS_QUALITY;
     private String targetDir;
 
     private CacheNameFactory cacheNameFactory;
@@ -132,7 +132,7 @@ public class Compress {
      */
     private File getOutFile() {
         if (TextUtils.isEmpty(targetDir)) {
-            File cacheDir = FileUtils.getDefaultCacheDir(context, Configuration.DEFAULT_CACHE_DIRECTORY_NAME);
+            File cacheDir = FileUtils.getDefaultCacheDir(context, Config.DEFAULT_CACHE_DIRECTORY_NAME);
             if (cacheDir == null) {
                 throw new IllegalStateException("Cache directory is null, check your storage permission and try again.");
             } else {

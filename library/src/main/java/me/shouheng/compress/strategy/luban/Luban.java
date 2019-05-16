@@ -2,7 +2,7 @@ package me.shouheng.compress.strategy.luban;
 
 import android.os.AsyncTask;
 import io.reactivex.Flowable;
-import me.shouheng.compress.strategy.Configuration;
+import me.shouheng.compress.strategy.Config;
 import me.shouheng.compress.strategy.SimpleStrategy;
 import me.shouheng.compress.utils.FileUtils;
 import me.shouheng.compress.utils.ImageUtils;
@@ -14,18 +14,21 @@ import java.util.concurrent.Callable;
 
 /**
  * The compress algorithm by <a href="https://github.com/Curzibn/Luban">Luban</a>.
+ *
+ * @author WngShhng
+ * @version 2019-05-17
  */
 public class Luban extends SimpleStrategy {
 
     /**
      * The image won't be compressed if the image size smaller than this value (KB).
      */
-    private int ignoreSize = Configuration.LUBAN_DEFAULT_IGNORE_SIZE; // KB
+    private int ignoreSize = Config.LUBAN_DEFAULT_IGNORE_SIZE; // KB
 
     /**
      * Should copy the image if the size of original image is less than {@link #ignoreSize}.
      */
-    private boolean copyWhenIgnore = Configuration.LUBAN_COPY_WHEN_IGNORE;
+    private boolean copyWhenIgnore = Config.LUBAN_COPY_WHEN_IGNORE;
 
     /**
      * The file won't be compressed if the image size is less than this value.

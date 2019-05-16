@@ -1,15 +1,24 @@
 package me.shouheng.compress.utils;
 
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.media.ExifInterface;
 
 import java.io.File;
 import java.io.IOException;
 
-public class ImageUtils {
+public final class ImageUtils {
 
     private ImageUtils() {
+        throw new UnsupportedOperationException("u can't initialize me");
     }
 
+    /**
+     * Get angle from image attribute.
+     *
+     * @param file the image file
+     * @return the angle of image
+     */
     public static int getImageAngle(File file) {
         ExifInterface exif;
         try {
@@ -44,6 +53,19 @@ public class ImageUtils {
             return source.exists() && source.length() > (leastCompressSize << 10);
         }
         return true;
+    }
+
+    /**
+     * Rotate given bitmap and return the result.
+     *
+     * @param srcBitmap the source bitmap
+     * @param angle the angle to rotate
+     * @return the rotated bitmap
+     */
+    public static Bitmap rotateBitmap(Bitmap srcBitmap, int angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(srcBitmap, 0, 0, srcBitmap.getWidth(), srcBitmap.getHeight(), matrix, true);
     }
 
 }

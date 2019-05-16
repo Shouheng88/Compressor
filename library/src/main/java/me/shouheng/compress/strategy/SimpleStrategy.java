@@ -3,17 +3,21 @@ package me.shouheng.compress.strategy;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.support.annotation.MainThread;
 import io.reactivex.Flowable;
 import me.shouheng.compress.AbstractStrategy;
 import me.shouheng.compress.utils.ImageUtils;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.concurrent.Callable;
 
 /**
  * Simple image compress logic, change the sample size only. Implement the
  * {@link #calInSampleSize()} method to add your own sample logic.
+ *
+ * @author WngShnng
  */
 public abstract class SimpleStrategy extends AbstractStrategy {
 
@@ -34,7 +38,7 @@ public abstract class SimpleStrategy extends AbstractStrategy {
         ByteArrayOutputStream bao = new ByteArrayOutputStream();
         int orientation = ImageUtils.getImageAngle(srcFile);
         if (orientation != 0) {
-            bitmap = rotateBitmap(bitmap, orientation);
+            bitmap = ImageUtils.rotateBitmap(bitmap, orientation);
         }
         bitmap.compress(format, quality, bao);
         bitmap.recycle();

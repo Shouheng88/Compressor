@@ -11,6 +11,7 @@ public final class FileUtils {
     private static final String TAG = "FileUtils";
 
     private FileUtils() {
+        throw new UnsupportedOperationException("u can't initialize me");
     }
 
     private static boolean isStorageWritable() {
@@ -39,7 +40,7 @@ public final class FileUtils {
             return result;
         }
         if (Log.isLoggable(TAG, Log.ERROR)) {
-            LogUtils.e("default disk cache dir is null");
+            LogLog.e("default disk cache dir is null");
         }
         return null;
     }
@@ -55,7 +56,7 @@ public final class FileUtils {
         try {
             return copyFile(new FileInputStream(source), new FileOutputStream(destination));
         } catch (FileNotFoundException e) {
-            LogUtils.e("Error copying file : " + e);
+            LogLog.e("Error copying file : " + e);
             return false;
         }
     }
@@ -79,7 +80,7 @@ public final class FileUtils {
             os.close();
             res = true;
         } catch (IOException e) {
-            LogUtils.e("Error copying file : " + e);
+            LogLog.e("Error copying file : " + e);
         }
         return res;
     }

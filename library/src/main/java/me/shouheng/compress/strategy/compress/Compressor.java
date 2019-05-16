@@ -4,7 +4,8 @@ import android.graphics.*;
 import android.os.AsyncTask;
 import io.reactivex.Flowable;
 import me.shouheng.compress.AbstractStrategy;
-import me.shouheng.compress.strategy.Configuration;
+import me.shouheng.compress.strategy.Config;
+import me.shouheng.compress.strategy.ScaleMode;
 import me.shouheng.compress.utils.ImageUtils;
 
 import java.io.File;
@@ -14,15 +15,18 @@ import java.util.concurrent.Callable;
 
 /**
  * The compress algorithm by <a href="https://github.com/zetbaitsu/Compressor">Compressor</a>.
+ *
+ * @author WngShhng
+ * @version 2019-05-17
  */
 public class Compressor extends AbstractStrategy {
 
-    private float maxWidth = Configuration.COMPRESSOR_DEFAULT_MAX_WIDTH;
+    private float maxWidth = Config.COMPRESSOR_DEFAULT_MAX_WIDTH;
 
-    private float maxHeight = Configuration.COMPRESSOR_DEFAULT_MAX_HEIGHT;
+    private float maxHeight = Config.COMPRESSOR_DEFAULT_MAX_HEIGHT;
 
-    @Configuration.ScaleMode
-    private int scaleMode = Configuration.COMPRESSOR_DEFAULT_SCALE_MODE;
+    @ScaleMode.Mode
+    private int scaleMode = Config.COMPRESSOR_DEFAULT_SCALE_MODE;
 
     /**
      * Set the max width of compressed image.
@@ -48,16 +52,16 @@ public class Compressor extends AbstractStrategy {
 
     /**
      * Set the scale mode when the destination image ratio differ from the original original.
-     * Might be one of {@link me.shouheng.compress.strategy.Configuration.ScaleMode#SCALE_LARGER},
-     * {@link me.shouheng.compress.strategy.Configuration.ScaleMode#SCALE_SMALLER},
-     * {@link me.shouheng.compress.strategy.Configuration.ScaleMode#SCALE_WIDTH} or
-     * {@link me.shouheng.compress.strategy.Configuration.ScaleMode#SCALE_HEIGHT}.
+     * Might be one of {@link ScaleMode#SCALE_LARGER},
+     * {@link ScaleMode#SCALE_SMALLER},
+     * {@link ScaleMode#SCALE_WIDTH} or
+     * {@link ScaleMode#SCALE_HEIGHT}.
      *
      * @param scaleMode the scale mode.
      * @return the compressor object.
-     * @see me.shouheng.compress.strategy.Configuration.ScaleMode
+     * @see ScaleMode
      */
-    public Compressor setScaleMode(@Configuration.ScaleMode int scaleMode) {
+    public Compressor setScaleMode(@ScaleMode.Mode int scaleMode) {
         this.scaleMode = scaleMode;
         return this;
     }
@@ -128,7 +132,7 @@ public class Compressor extends AbstractStrategy {
 
         int orientation = ImageUtils.getImageAngle(srcFile);
         if (orientation != 0) {
-            scaledBitmap = rotateBitmap(scaledBitmap, ImageUtils.getImageAngle(srcFile));
+            scaledBitmap = ImageUtils.rotateBitmap(scaledBitmap, ImageUtils.getImageAngle(srcFile));
         }
 
         return scaledBitmap;
@@ -136,7 +140,7 @@ public class Compressor extends AbstractStrategy {
 
     protected int calculateRequiredWidth(float imgRatio, float reqRatio) {
         switch (scaleMode) {
-            case Configuration.SCALE_LARGER: {
+            case ScaleMode.SCALE_LARGER: {
                 if (srcHeight > maxHeight || srcWidth > maxWidth) {
                     // If Height is greater
                     if (imgRatio < reqRatio) {
@@ -149,7 +153,7 @@ public class Compressor extends AbstractStrategy {
                 }
                 break;
             }
-            case Configuration.SCALE_SMALLER: {
+            case ScaleMode.SCALE_SMALLER: {
                 if (srcHeight > maxHeight || srcWidth > maxWidth) {
                     // If Height is greater
                     if (imgRatio < reqRatio) {
@@ -162,10 +166,10 @@ public class Compressor extends AbstractStrategy {
                 }
                 break;
             }
-            case Configuration.SCALE_HEIGHT: {
+            case ScaleMode.SCALE_HEIGHT: {
                 return (int) (srcWidth * maxHeight / srcHeight);
             }
-            case Configuration.SCALE_WIDTH: {
+            case ScaleMode.SCALE_WIDTH: {
                 return (int) maxWidth;
             }
             default:
@@ -176,7 +180,7 @@ public class Compressor extends AbstractStrategy {
 
     protected int calculateRequiredHeight(float imgRatio, float reqRatio) {
         switch (scaleMode) {
-            case Configuration.SCALE_LARGER: {
+            case ScaleMode.SCALE_LARGER: {
                 if (srcHeight > maxHeight || srcWidth > maxWidth) {
                     // If Height is greater
                     if (imgRatio < reqRatio) {
@@ -189,7 +193,7 @@ public class Compressor extends AbstractStrategy {
                 }
                 break;
             }
-            case Configuration.SCALE_SMALLER: {
+            case ScaleMode.SCALE_SMALLER: {
                 if (srcHeight > maxHeight || srcWidth > maxWidth) {
                     // If Height is greater
                     if (imgRatio < reqRatio) {
@@ -202,10 +206,10 @@ public class Compressor extends AbstractStrategy {
                 }
                 break;
             }
-            case Configuration.SCALE_HEIGHT: {
+            case ScaleMode.SCALE_HEIGHT: {
                 return (int) maxHeight;
             }
-            case Configuration.SCALE_WIDTH: {
+            case ScaleMode.SCALE_WIDTH: {
                 imgRatio = maxWidth / srcWidth;
                 return (int) (srcHeight * imgRatio);
             }
