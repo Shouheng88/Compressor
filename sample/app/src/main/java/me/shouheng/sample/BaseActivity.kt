@@ -25,14 +25,14 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             if (onGetPermissionCallback != null) {
                 onGetPermissionCallback!!.onGetPermission()
             }
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 // Add array length check logic to avoid ArrayIndexOutOfBoundsException
-                if (permissions.size > 0 && !shouldShowRequestPermissionRationale(permissions[0])) {
+                if (permissions.isNotEmpty() && !shouldShowRequestPermissionRationale(permissions[0])) {
                     showPermissionSettingDialog(requestCode)
                 } else {
                     Toast.makeText(this, getToastMessage(requestCode), Toast.LENGTH_SHORT).show()

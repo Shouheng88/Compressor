@@ -105,7 +105,7 @@ public class Compressor extends AbstractStrategy {
         Bitmap bmp = null;
         try {
             bmp = BitmapFactory.decodeFile(srcFile.getAbsolutePath(), options);
-            scaledBitmap = Bitmap.createBitmap(reqWidth, reqHeight, Bitmap.Config.ARGB_8888);
+            scaledBitmap = Bitmap.createBitmap(reqWidth, reqHeight, config == null ? Bitmap.Config.ARGB_8888 : config);
         } catch (OutOfMemoryError e) {
             e.printStackTrace();
         }
