@@ -23,6 +23,7 @@ import me.shouheng.compress.listener.CompressListener
 import me.shouheng.compress.strategy.Strategies
 import me.shouheng.compress.strategy.config.ScaleMode
 import me.shouheng.sample.databinding.ActivityMainBinding
+import me.shouheng.utils.app.ActivityHelper
 import me.shouheng.utils.app.IntentUtils
 import me.shouheng.utils.permission.Permission
 import me.shouheng.utils.permission.PermissionUtils
@@ -110,6 +111,9 @@ class MainActivity : BaseActivity() {
                 intent.type = "image/*"
                 startActivityForResult(intent, REQUEST_SELECT_IMAGE)
             }
+        }
+        binding.btnSample.setOnClickListener {
+            ActivityHelper.start(this@MainActivity, SampleActivity::class.java)
         }
 
         /* configuration for luban */

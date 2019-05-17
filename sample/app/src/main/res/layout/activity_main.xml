@@ -327,6 +327,7 @@
             </LinearLayout>
 
             <LinearLayout
+                    android:id="@+id/ll_custom"
                     app:layout_constraintTop_toBottomOf="@id/ll_compressor"
                     android:orientation="vertical"
                     android:layout_width="match_parent"
@@ -357,6 +358,14 @@
                         android:layout_height="wrap_content"/>
 
             </LinearLayout>
+
+            <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/btn_sample"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintTop_toBottomOf="@id/ll_custom"
+                    android:text="Samples entry"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
         </android.support.constraint.ConstraintLayout>
 
