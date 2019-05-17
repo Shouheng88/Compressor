@@ -21,11 +21,15 @@ import me.shouheng.compress.Compress
 import me.shouheng.compress.listener.CompressListener
 import me.shouheng.compress.strategy.ScaleMode
 import me.shouheng.compress.strategy.Strategies
-import me.shouheng.compress.utils.LogLog
 import me.shouheng.sample.databinding.ActivityMainBinding
-import me.shouheng.sample.utils.FileManager
-import me.shouheng.sample.utils.MySimpleStrategy
-import me.shouheng.sample.utils.PermissionUtils
+import me.shouheng.utils.app.IntentUtils
+import me.shouheng.utils.permission.Permission
+import me.shouheng.utils.permission.PermissionUtils
+import me.shouheng.utils.permission.callback.OnGetPermissionCallback
+import me.shouheng.utils.stability.LogUtils
+import me.shouheng.utils.store.FileUtils
+import me.shouheng.utils.store.PathUtils
+import me.shouheng.utils.ui.ToastUtils
 import java.io.File
 
 class MainActivity : BaseActivity() {
@@ -91,8 +95,6 @@ class MainActivity : BaseActivity() {
                 scaleMode = scaleArray[position]
             }
         }
-
-        LogLog.setDebug(true)
     }
 
     fun compressor(v: View) {
@@ -102,7 +104,7 @@ class MainActivity : BaseActivity() {
             val file = File(filePath)
 
             // connect compressor object
-            LogLog.d("Current configuration: \nConfig: $config\nScaleMode: $scaleMode")
+            LogUtils.d("Current configuration: \nConfig: $config\nScaleMode: $scaleMode")
 
             // add scale mode
             val compressor = Compress.with(this, file)
@@ -110,19 +112,19 @@ class MainActivity : BaseActivity() {
                 .setTargetDir("")
                 .setCompressListener(object : CompressListener {
                     override fun onStart() {
-                        LogLog.d(Thread.currentThread().toString())
-                        Toast.makeText(this@MainActivity, "Compress Start", Toast.LENGTH_SHORT).show()
+                        LogUtils.d(Thread.currentThread().toString())
+                        ToastUtils.showShort("Compress Start")
                     }
 
                     override fun onSuccess(result: File?) {
-                        LogLog.d(Thread.currentThread().toString())
+                        LogUtils.d(Thread.currentThread().toString())
                         displayResult(result?.absolutePath)
-                        Toast.makeText(this@MainActivity, "Compress Success : $result", Toast.LENGTH_SHORT).show()
+                        ToastUtils.showShort("Compress Success : $result")
                     }
 
                     override fun onError(throwable: Throwable?) {
-                        LogLog.d(Thread.currentThread().toString())
-                        Toast.makeText(this@MainActivity, "Compress Error ：$throwable", Toast.LENGTH_SHORT).show()
+                        LogUtils.d(Thread.currentThread().toString())
+                        ToastUtils.showShort("Compress Error ：$throwable")
                     }
                 })
                 .strategy(Strategies.compressor())
@@ -140,7 +142,7 @@ class MainActivity : BaseActivity() {
                         .subscribe({
                             displayResult(it.absolutePath)
                         }, {
-                            Toast.makeText(this@MainActivity, "Compress Error ：$it", Toast.LENGTH_SHORT).show()
+                            ToastUtils.showShort("Compress Error ：$it")
                         })
             } else {
                 compressor.launch()
@@ -159,19 +161,19 @@ class MainActivity : BaseActivity() {
             val luban = Compress.with(this, file)
                 .setCompressListener(object : CompressListener{
                     override fun onStart() {
-                        LogLog.d(Thread.currentThread().toString())
-                        Toast.makeText(this@MainActivity, "Compress Start", Toast.LENGTH_SHORT).show()
+                        LogUtils.d(Thread.currentThread().toString())
+                        ToastUtils.showShort("Compress Start")
                     }
 
                     override fun onSuccess(result: File?) {
-                        LogLog.d(Thread.currentThread().toString())
+                        LogUtils.d(Thread.currentThread().toString())
                         displayResult(result?.absolutePath)
-                        Toast.makeText(this@MainActivity, "Compress Success : $result", Toast.LENGTH_SHORT).show()
+                        ToastUtils.showShort("Compress Success : $result")
                     }
 
                     override fun onError(throwable: Throwable?) {
-                        LogLog.d(Thread.currentThread().toString())
-                        Toast.makeText(this@MainActivity, "Compress Error ：$throwable", Toast.LENGTH_SHORT).show()
+                        LogUtils.d(Thread.currentThread().toString())
+                        ToastUtils.showShort("Compress Error ：$throwable")
                     }
                 })
                 .setCacheNameFactory { System.currentTimeMillis().toString() + ".jpg" }
@@ -187,7 +189,7 @@ class MainActivity : BaseActivity() {
                     .subscribe({
                         displayResult(it.absolutePath)
                     }, {
-                        Toast.makeText(this@MainActivity, "Compress Error ：$it", Toast.LENGTH_SHORT).show()
+                        ToastUtils.showShort("Compress Error ：$it", Toast.LENGTH_SHORT)
                     })
             } else {
                 luban.launch()
@@ -196,30 +198,25 @@ class MainActivity : BaseActivity() {
     }
 
     fun capture(v: View) {
-        val file = FileManager.createAttachment(this, ".png")
-        if (file != null) {
-            originalFile = file
-            PermissionUtils.checkCameraPermission(this, object : PermissionUtils.OnGetPermissionCallback {
-                override fun onGetPermission() {
-                    val uri = FileManager.getUriFromFile(this@MainActivity, file)
-                    val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
-                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
-                }
-            })
-        } else{
-            Toast.makeText(this, "Can't create file!", Toast.LENGTH_SHORT).show()
-        }
+        PermissionUtils.checkPermissions(this, OnGetPermissionCallback {
+            val file = File(PathUtils.getExternalPicturesPath(), "${System.currentTimeMillis()}.jpeg")
+            val succeed = FileUtils.createOrExistsFile(file)
+            if (succeed) {
+                originalFile = file
+                val uri = Utils.getUriFromFile(this@MainActivity, file)
+                startActivityForResult(IntentUtils.getCaptureIntent(uri), REQUEST_IMAGE_CAPTURE)
+            } else{
+                ToastUtils.showShort("Can't create file!", Toast.LENGTH_SHORT)
+            }
+        }, Permission.CAMERA, Permission.STORAGE)
     }
 
     fun choose(v: View) {
-        PermissionUtils.checkStoragePermission(this, object : PermissionUtils.OnGetPermissionCallback {
-            override fun onGetPermission() {
-                val intent = Intent(Intent.ACTION_PICK)
-                intent.type = "image/*"
-                startActivityForResult(intent, REQUEST_SELECT_IMAGE)
-            }
-        })
+        PermissionUtils.checkStoragePermission(this) {
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            startActivityForResult(intent, REQUEST_SELECT_IMAGE)
+        }
     }
 
     fun custom(v: View) {
@@ -231,19 +228,19 @@ class MainActivity : BaseActivity() {
             Compress.with(this@MainActivity, file)
                 .setCompressListener(object : CompressListener{
                     override fun onStart() {
-                        LogLog.d(Thread.currentThread().toString())
-                        Toast.makeText(this@MainActivity, "Compress Start", Toast.LENGTH_SHORT).show()
+                        LogUtils.d(Thread.currentThread().toString())
+                        ToastUtils.showShort("Compress Start")
                     }
 
                     override fun onSuccess(result: File?) {
-                        LogLog.d(Thread.currentThread().toString())
+                        LogUtils.d(Thread.currentThread().toString())
                         displayResult(result?.absolutePath)
-                        Toast.makeText(this@MainActivity, "Compress Success : $result", Toast.LENGTH_SHORT).show()
+                        ToastUtils.showShort("Compress Success : $result")
                     }
 
                     override fun onError(throwable: Throwable?) {
-                        LogLog.d(Thread.currentThread().toString())
-                        Toast.makeText(this@MainActivity, "Compress Error ：$throwable", Toast.LENGTH_SHORT).show()
+                        LogUtils.d(Thread.currentThread().toString())
+                        ToastUtils.showShort("Compress Error ：$throwable")
                     }
                 })
                 .setQuality(80)
@@ -276,7 +273,7 @@ class MainActivity : BaseActivity() {
 
     private fun displayOriginal(filePath: String?) {
         if (TextUtils.isEmpty(filePath)) {
-            Toast.makeText(this, "Error when displaying image info!", Toast.LENGTH_SHORT).show()
+            ToastUtils.showShort("Error when displaying image info!")
             return
         }
         val options = BitmapFactory.Options()
@@ -294,7 +291,7 @@ class MainActivity : BaseActivity() {
 
     private fun displayResult(filePath: String?) {
         if (TextUtils.isEmpty(filePath)) {
-            Toast.makeText(this, "Error when displaying image info!", Toast.LENGTH_SHORT).show()
+            ToastUtils.showShort("Error when displaying image info!")
             return
         }
         val options = BitmapFactory.Options()
