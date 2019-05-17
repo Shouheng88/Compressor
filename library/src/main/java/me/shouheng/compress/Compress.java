@@ -30,7 +30,6 @@ public class Compress {
     private Bitmap.CompressFormat format = Config.DEFAULT_COMPRESS_FORMAT;
     private int quality = Config.DEFAULT_COMPRESS_QUALITY;
     private String targetDir;
-    private Bitmap.Config config;
 
     private CacheNameFactory cacheNameFactory;
     private CompressListener compressListener;
@@ -71,18 +70,6 @@ public class Compress {
      */
     public Compress setQuality(@IntRange(from = 0, to = 100) int quality) {
         this.quality = quality;
-        return this;
-    }
-
-    /**
-     * Set the image configuration for bitmap: {@link android.graphics.Bitmap.Config}.
-     *
-     * @param config the config
-     * @return the compress object
-     * @see android.graphics.Bitmap.Config
-     */
-    public Compress setConfig(Bitmap.Config config) {
-        this.config = config;
         return this;
     }
 
@@ -133,7 +120,6 @@ public class Compress {
         t.setSrcFile(srcFile);
         t.setFormat(format);
         t.setQuality(quality);
-        t.setConfig(config);
         t.setOutFile(getOutFile());
         t.setCompressListener(compressListener);
         return t;

@@ -44,4 +44,13 @@
     <string name="permission_denied_try_again_after_set">没有权限，请授予权限之后再次尝试。</string>
     <string name="permission_denied_try_again_after_set_given_permission">没有权限，请授予%s权限之后再次尝试。</string>
 
+    <array name="color_config">
+        <item>ARGB_8888</item>
+        <item>ALPHA_8</item>
+        <item>RGB_565</item>
+        <item>ARGB_4444</item>
+        <item>RGBA_F16</item>
+        <item>HARDWARE</item>
+    </array>
+
 </resources>

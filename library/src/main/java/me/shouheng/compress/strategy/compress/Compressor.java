@@ -7,6 +7,7 @@ import me.shouheng.compress.AbstractStrategy;
 import me.shouheng.compress.strategy.Config;
 import me.shouheng.compress.strategy.ScaleMode;
 import me.shouheng.compress.utils.ImageUtils;
+import me.shouheng.compress.utils.LogLog;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,6 +28,8 @@ public class Compressor extends AbstractStrategy {
 
     @ScaleMode.Mode
     private int scaleMode = Config.COMPRESSOR_DEFAULT_SCALE_MODE;
+
+    private Bitmap.Config config;
 
     /**
      * Set the max width of compressed image.
@@ -66,6 +69,18 @@ public class Compressor extends AbstractStrategy {
         return this;
     }
 
+    /**
+     * Set the image configuration for bitmap: {@link android.graphics.Bitmap.Config}.
+     *
+     * @param config the config
+     * @return the compress object
+     * @see android.graphics.Bitmap.Config
+     */
+    public Compressor setConfig(Bitmap.Config config) {
+        this.config = config;
+        return this;
+    }
+
     private boolean doCompress() throws IOException {
         prepareImageSizeInfo();
 
@@ -101,14 +116,8 @@ public class Compressor extends AbstractStrategy {
         options.inInputShareable = true;
         options.inTempStorage = new byte[16 * 1024];
 
-        Bitmap scaledBitmap = null;
-        Bitmap bmp = null;
-        try {
-            bmp = BitmapFactory.decodeFile(srcFile.getAbsolutePath(), options);
-            scaledBitmap = Bitmap.createBitmap(reqWidth, reqHeight, config == null ? Bitmap.Config.ARGB_8888 : config);
-        } catch (OutOfMemoryError e) {
-            e.printStackTrace();
-        }
+        Bitmap bmp = BitmapFactory.decodeFile(srcFile.getAbsolutePath(), options);
+        Bitmap scaledBitmap = Bitmap.createBitmap(reqWidth, reqHeight, config == null ? Bitmap.Config.ARGB_8888 : config);
 
         // Return null if OOM.
         if (bmp == null || scaledBitmap == null) {
@@ -140,7 +149,7 @@ public class Compressor extends AbstractStrategy {
 
     protected int calculateRequiredWidth(float imgRatio, float reqRatio) {
         switch (scaleMode) {
-            case ScaleMode.SCALE_LARGER: {
+            case ScaleMode.SCALE_LARGER:
                 if (srcHeight > maxHeight || srcWidth > maxWidth) {
                     // If Height is greater
                     if (imgRatio < reqRatio) {
@@ -152,8 +161,7 @@ public class Compressor extends AbstractStrategy {
                     }
                 }
                 break;
-            }
-            case ScaleMode.SCALE_SMALLER: {
+            case ScaleMode.SCALE_SMALLER:
                 if (srcHeight > maxHeight || srcWidth > maxWidth) {
                     // If Height is greater
                     if (imgRatio < reqRatio) {
@@ -165,13 +173,10 @@ public class Compressor extends AbstractStrategy {
                     }
                 }
                 break;
-            }
-            case ScaleMode.SCALE_HEIGHT: {
+            case ScaleMode.SCALE_HEIGHT:
                 return (int) (srcWidth * maxHeight / srcHeight);
-            }
-            case ScaleMode.SCALE_WIDTH: {
+            case ScaleMode.SCALE_WIDTH:
                 return (int) maxWidth;
-            }
             default:
                 return (int) maxWidth;
         }
@@ -180,7 +185,7 @@ public class Compressor extends AbstractStrategy {
 
     protected int calculateRequiredHeight(float imgRatio, float reqRatio) {
         switch (scaleMode) {
-            case ScaleMode.SCALE_LARGER: {
+            case ScaleMode.SCALE_LARGER:
                 if (srcHeight > maxHeight || srcWidth > maxWidth) {
                     // If Height is greater
                     if (imgRatio < reqRatio) {
@@ -192,8 +197,7 @@ public class Compressor extends AbstractStrategy {
                     }
                 }
                 break;
-            }
-            case ScaleMode.SCALE_SMALLER: {
+            case ScaleMode.SCALE_SMALLER:
                 if (srcHeight > maxHeight || srcWidth > maxWidth) {
                     // If Height is greater
                     if (imgRatio < reqRatio) {
@@ -205,14 +209,11 @@ public class Compressor extends AbstractStrategy {
                     }
                 }
                 break;
-            }
-            case ScaleMode.SCALE_HEIGHT: {
+            case ScaleMode.SCALE_HEIGHT:
                 return (int) maxHeight;
-            }
-            case ScaleMode.SCALE_WIDTH: {
+            case ScaleMode.SCALE_WIDTH:
                 imgRatio = maxWidth / srcWidth;
                 return (int) (srcHeight * imgRatio);
-            }
             default:
                 return (int) maxHeight;
         }
@@ -253,8 +254,9 @@ public class Compressor extends AbstractStrategy {
                         notifyCompressError(new Exception("Failed to compress image, either caused by OOM or other problems."));
                     }
                     return Flowable.just(outFile);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     notifyCompressError(e);
+                    LogLog.e(e.getMessage());
                     return Flowable.error(e);
                 }
             }
@@ -274,9 +276,9 @@ public class Compressor extends AbstractStrategy {
                     } else {
                         notifyCompressError(new Exception("Failed to compress image, either caused by OOM or other problems."));
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     notifyCompressError(e);
-                    e.printStackTrace();
+                    LogLog.e(e.getMessage());
                 }
             }
         });

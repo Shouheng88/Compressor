@@ -5,11 +5,14 @@ import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.support.annotation.RequiresApi
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.AdapterView
 import android.widget.Toast
 import com.bumptech.glide.Glide
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -33,6 +36,15 @@ class MainActivity : BaseActivity() {
     }
 
     private lateinit var originalFile: File
+    private var config = Bitmap.Config.ALPHA_8
+    @RequiresApi(Build.VERSION_CODES.O)
+    private var configArray = arrayOf(
+        Bitmap.Config.ARGB_8888,
+        Bitmap.Config.ALPHA_8,
+        Bitmap.Config.RGB_565,
+        Bitmap.Config.ARGB_4444,
+        Bitmap.Config.RGBA_F16,
+        Bitmap.Config.HARDWARE)
 
     private lateinit var binding: ActivityMainBinding
 
@@ -50,6 +62,17 @@ class MainActivity : BaseActivity() {
             }
             true
         }
+        binding.asp.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    config = configArray[position]
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // nothing
+            }
+        }
 
         LogLog.setDebug(true)
     }
@@ -61,12 +84,12 @@ class MainActivity : BaseActivity() {
             val file = File(filePath)
 
             // connect compressor object
+            LogLog.d("$config")
 
             // add scale mode
             val compressor = Compress.with(this, file)
                 .setQuality(60)
                 .setTargetDir("")
-                .setConfig(Bitmap.Config.RGB_565)
                 .setCompressListener(object : CompressListener {
                     override fun onStart() {
                         LogLog.d(Thread.currentThread().toString())
@@ -85,6 +108,7 @@ class MainActivity : BaseActivity() {
                     }
                 })
                 .strategy(Strategies.compressor())
+                .setConfig(config)
                 .setMaxHeight(100f)
                 .setMaxWidth(100f)
             if (binding.rbScaleWidth.isChecked) {
@@ -169,9 +193,13 @@ class MainActivity : BaseActivity() {
     }
 
     fun choose(v: View) {
-        val intent = Intent(Intent.ACTION_PICK)
-        intent.type = "image/*"
-        startActivityForResult(intent, REQUEST_SELECT_IMAGE)
+        PermissionUtils.checkStoragePermission(this, object : PermissionUtils.OnGetPermissionCallback {
+            override fun onGetPermission() {
+                val intent = Intent(Intent.ACTION_PICK)
+                intent.type = "image/*"
+                startActivityForResult(intent, REQUEST_SELECT_IMAGE)
+            }
+        })
     }
 
     fun custom(v: View) {
@@ -257,7 +285,7 @@ class MainActivity : BaseActivity() {
         options.inJustDecodeBounds = false
         val bitmap = BitmapFactory.decodeFile(filePath, options)
         binding.ivResult.setImageBitmap(bitmap)
-        val size = bitmap.byteCount
+        val size = bitmap?.byteCount?:0
         binding.tvResult.text = "Result:\nwidth: $actualWidth\nheight:$actualHeight\nsize:$size"
         binding.ivResult.tag = filePath
     }

@@ -28,7 +28,6 @@ public abstract class AbstractStrategy implements Handler.Callback {
     protected Bitmap.CompressFormat format = Config.DEFAULT_COMPRESS_FORMAT;
     protected int quality = Config.DEFAULT_COMPRESS_QUALITY;
     protected CompressListener compressListener;
-    protected Bitmap.Config config;
 
     protected int srcWidth;
     protected int srcHeight;
@@ -94,10 +93,6 @@ public abstract class AbstractStrategy implements Handler.Callback {
 
     /* package */ void setOutFile(File outFile) {
         this.outFile = outFile;
-    }
-
-    /* package */ void setConfig(Bitmap.Config config) {
-        this.config = config;
     }
 
     /* package */ void setCompressListener(CompressListener compressListener) {

@@ -268,6 +268,12 @@
 
                 </HorizontalScrollView>
 
+                <android.support.v7.widget.AppCompatSpinner
+                        android:id="@+id/asp"
+                        android:entries="@array/color_config"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
                 <android.support.v7.widget.AppCompatButton
                         android:id="@+id/btn_compressor"
                         android:text="@string/text_compress_by_compressor"
