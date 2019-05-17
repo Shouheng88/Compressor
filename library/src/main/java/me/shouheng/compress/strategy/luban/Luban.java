@@ -77,7 +77,7 @@ public class Luban extends SimpleStrategy {
 
     @Override
     public Flowable<File> asFlowable() {
-        if (ImageUtils.needCompress(srcFile.getAbsolutePath(), ignoreSize)) {
+        if (srcFile == null || ImageUtils.needCompress(srcFile.getAbsolutePath(), ignoreSize)) {
             return super.asFlowable();
         } else {
             // don't need to compress.
@@ -112,7 +112,7 @@ public class Luban extends SimpleStrategy {
 
     @Override
     public void launch() {
-        if (ImageUtils.needCompress(srcFile.getAbsolutePath(), ignoreSize)) {
+        if (srcFile == null || ImageUtils.needCompress(srcFile.getAbsolutePath(), ignoreSize)) {
             super.launch();
         } else {
             if (copyWhenIgnore) {

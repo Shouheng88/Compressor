@@ -14,6 +14,7 @@
     <string name="text_launch_type_flowable">Flowable</string>
     <string name="text_ignore_type">Copy when ignore : \t</string>
     <string name="text_compress_by_luban">Compress by Luban</string>
+    <string name="text_result_type">Result type : </string>
 
     <string name="text_compress_region_compressor">Compressor Compress Strategy Region: </string>
     <string name="text_compress_scale_mode">Scale mode : </string>
@@ -52,6 +53,11 @@
     <array name="source_type">
         <item>File</item>
         <item>ByteArray</item>
+        <item>Bitmap</item>
+    </array>
+
+    <array name="result_type">
+        <item>File</item>
         <item>Bitmap</item>
     </array>
 
