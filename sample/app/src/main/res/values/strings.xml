@@ -8,7 +8,8 @@
     <string name="text_choose">From File System</string>
 
     <string name="text_compress_region_luban">Luban Compress Strategy Region: </string>
-    <string name="text_launch_type">Launch Type : </string>
+    <string name="text_source_type">Source mode : </string>
+    <string name="text_launch_type">Launch mode : </string>
     <string name="text_launch_type_launch">Launch</string>
     <string name="text_launch_type_flowable">Flowable</string>
     <string name="text_ignore_type">Copy when ignore : \t</string>
@@ -40,6 +41,18 @@
         <item>SCALE_SMALLER</item>
         <item>SCALE_WIDTH</item>
         <item>SCALE_HEIGHT</item>
+    </array>
+
+    <array name="launch_type">
+        <item>launch</item>
+        <item>asFlowable</item>
+        <item>get</item>
+    </array>
+
+    <array name="source_type">
+        <item>File</item>
+        <item>ByteArray</item>
+        <item>Bitmap</item>
     </array>
 
 </resources>

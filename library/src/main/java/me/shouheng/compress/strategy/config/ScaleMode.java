@@ -1,4 +1,4 @@
-package me.shouheng.compress.strategy;
+package me.shouheng.compress.strategy.config;
 
 import android.support.annotation.IntDef;
 

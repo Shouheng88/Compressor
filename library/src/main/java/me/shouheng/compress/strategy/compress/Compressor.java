@@ -4,8 +4,8 @@ import android.graphics.*;
 import android.os.AsyncTask;
 import io.reactivex.Flowable;
 import me.shouheng.compress.AbstractStrategy;
-import me.shouheng.compress.strategy.Config;
-import me.shouheng.compress.strategy.ScaleMode;
+import me.shouheng.compress.strategy.config.Config;
+import me.shouheng.compress.strategy.config.ScaleMode;
 import me.shouheng.compress.utils.ImageUtils;
 import me.shouheng.compress.utils.LogLog;
 
@@ -30,6 +30,8 @@ public class Compressor extends AbstractStrategy {
     private int scaleMode = Config.COMPRESSOR_DEFAULT_SCALE_MODE;
 
     private Bitmap.Config config;
+
+    /*--------------------------------------- public methods ------------------------------------------*/
 
     /**
      * Set the max width of compressed image.
@@ -81,71 +83,69 @@ public class Compressor extends AbstractStrategy {
         return this;
     }
 
-    private boolean doCompress() throws IOException {
-        prepareImageSizeInfo();
-
-        Bitmap bitmap = decodeBitmap();
-        if (bitmap != null) {
-            FileOutputStream fos = new FileOutputStream(outFile);
-            bitmap.compress(format, quality, fos);
-            fos.flush();
-            fos.close();
-        } else {
-            return false;
+    @Override
+    public File get() {
+        try {
+            notifyCompressStart();
+            compressAndWrite();
+            notifyCompressSuccess(outFile);
+        } catch (Exception e) {
+            LogLog.e(e.getMessage());
+            notifyCompressError(e);
         }
-
-        return true;
+        return outFile;
     }
 
-    private Bitmap decodeBitmap() {
-        float imgRatio = (float) srcWidth / (float) srcHeight;
-        float reqRatio = maxWidth / maxHeight;
-
-        int reqWidth = calculateRequiredWidth(imgRatio, reqRatio);
-        int reqHeight = calculateRequiredHeight(imgRatio, reqRatio);
-
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        options.inSampleSize = 1;
-        BitmapFactory.decodeFile(srcFile.getAbsolutePath(), options);
-
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-        options.inJustDecodeBounds = false;
-        options.inDither = false;
-        options.inPurgeable = true;
-        options.inInputShareable = true;
-        options.inTempStorage = new byte[16 * 1024];
-
-        Bitmap bmp = BitmapFactory.decodeFile(srcFile.getAbsolutePath(), options);
-        Bitmap scaledBitmap = Bitmap.createBitmap(reqWidth, reqHeight, config == null ? Bitmap.Config.ARGB_8888 : config);
-
-        // Return null if OOM.
-        if (bmp == null || scaledBitmap == null) {
-            return null;
-        }
-
-        // Scale the bitmap.
-        float ratioX = reqWidth / (float) options.outWidth;
-        float ratioY = reqHeight / (float) options.outHeight;
-        float middleX = reqWidth / 2.0f;
-        float middleY = reqHeight / 2.0f;
-
-        Matrix scaleMatrix = new Matrix();
-        scaleMatrix.setScale(ratioX, ratioY, middleX, middleY);
-
-        Canvas canvas = new Canvas(scaledBitmap);
-        canvas.setMatrix(scaleMatrix);
-        canvas.drawBitmap(bmp, middleX - bmp.getWidth() / 2,
-                middleY - bmp.getHeight() / 2, new Paint(Paint.FILTER_BITMAP_FLAG));
-        bmp.recycle();
-
-        int orientation = ImageUtils.getImageAngle(srcFile);
-        if (orientation != 0) {
-            scaledBitmap = ImageUtils.rotateBitmap(scaledBitmap, ImageUtils.getImageAngle(srcFile));
-        }
-
-        return scaledBitmap;
+    @Override
+    public Flowable<File> asFlowable() {
+        return Flowable.defer(new Callable<Flowable<File>>() {
+            @Override
+            public Flowable<File> call() {
+                try {
+                    notifyCompressStart();
+                    boolean succeed = compressAndWrite();
+                    if (succeed) {
+                        notifyCompressSuccess(outFile);
+                    } else {
+                        notifyCompressError(new Exception("Failed to compress image, either caused by OOM or other problems."));
+                    }
+                    return Flowable.just(outFile);
+                } catch (Exception e) {
+                    notifyCompressError(e);
+                    LogLog.e(e.getMessage());
+                    return Flowable.error(e);
+                }
+            }
+        });
     }
+
+    @Override
+    public void launch() {
+        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    notifyCompressStart();
+                    boolean succeed = compressAndWrite();
+                    if (succeed) {
+                        notifyCompressSuccess(outFile);
+                    } else {
+                        notifyCompressError(new Exception("Failed to compress image, either caused by OOM or other problems."));
+                    }
+                } catch (Exception e) {
+                    notifyCompressError(e);
+                    LogLog.e(e.getMessage());
+                }
+            }
+        });
+    }
+
+    @Override
+    protected Bitmap getBitmap() {
+        return compress();
+    }
+
+    /*--------------------------------------- protected methods ------------------------------------------*/
 
     protected int calculateRequiredWidth(float imgRatio, float reqRatio) {
         switch (scaleMode) {
@@ -240,48 +240,89 @@ public class Compressor extends AbstractStrategy {
         return inSampleSize;
     }
 
-    @Override
-    public Flowable<File> asFlowable() {
-        return Flowable.defer(new Callable<Flowable<File>>() {
-            @Override
-            public Flowable<File> call() {
-                try {
-                    notifyCompressStart();
-                    boolean succeed = doCompress();
-                    if (succeed) {
-                        notifyCompressSuccess(outFile);
-                    } else {
-                        notifyCompressError(new Exception("Failed to compress image, either caused by OOM or other problems."));
-                    }
-                    return Flowable.just(outFile);
-                } catch (Exception e) {
-                    notifyCompressError(e);
-                    LogLog.e(e.getMessage());
-                    return Flowable.error(e);
-                }
-            }
-        });
+    /*--------------------------------------- inner methods ------------------------------------------*/
+
+    private boolean compressAndWrite() throws IOException {
+        Bitmap bitmap = compress();
+        if (bitmap != null) {
+            FileOutputStream fos = new FileOutputStream(outFile);
+            bitmap.compress(format, quality, fos);
+            fos.flush();
+            fos.close();
+        } else {
+            return false;
+        }
+        return true;
     }
 
-    @Override
-    public void launch() {
-        AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    notifyCompressStart();
-                    boolean succeed = doCompress();
-                    if (succeed) {
-                        notifyCompressSuccess(outFile);
-                    } else {
-                        notifyCompressError(new Exception("Failed to compress image, either caused by OOM or other problems."));
-                    }
-                } catch (Exception e) {
-                    notifyCompressError(e);
-                    LogLog.e(e.getMessage());
-                }
+    private Bitmap compress() {
+        prepareImageSizeInfo();
+        return decodeBitmap();
+    }
+
+    private Bitmap decodeBitmap() {
+        float imgRatio = (float) srcWidth / (float) srcHeight;
+        float reqRatio = maxWidth / maxHeight;
+
+        int reqWidth = calculateRequiredWidth(imgRatio, reqRatio);
+        int reqHeight = calculateRequiredHeight(imgRatio, reqRatio);
+        Bitmap bmp = srcBitmap;
+
+        if (srcData != null || srcFile != null) {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            options.inSampleSize = 1;
+
+            if (srcData != null) {
+                BitmapFactory.decodeByteArray(srcData, 0, srcData.length, options);
+            } else {
+                BitmapFactory.decodeFile(srcFile.getAbsolutePath(), options);
             }
-        });
+
+            options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+            options.inJustDecodeBounds = false;
+            options.inDither = false;
+            options.inPurgeable = true;
+            options.inInputShareable = true;
+            options.inTempStorage = new byte[16 * 1024];
+
+            if (srcData != null) {
+                bmp = BitmapFactory.decodeByteArray(srcData, 0, srcData.length, options);
+            } else {
+                bmp = BitmapFactory.decodeFile(srcFile.getAbsolutePath(), options);
+            }
+        }
+
+        Bitmap scaledBitmap = Bitmap.createBitmap(reqWidth, reqHeight, config == null ? Bitmap.Config.ARGB_8888 : config);
+
+        // return null if OOM.
+        if (bmp == null || scaledBitmap == null) {
+            return null;
+        }
+
+        // scale the bitmap.
+        float ratioX = reqWidth / (float) bmp.getWidth();
+        float ratioY = reqHeight / (float) bmp.getHeight();
+        float middleX = reqWidth / 2.0f;
+        float middleY = reqHeight / 2.0f;
+
+        Matrix scaleMatrix = new Matrix();
+        scaleMatrix.setScale(ratioX, ratioY, middleX, middleY);
+
+        Canvas canvas = new Canvas(scaledBitmap);
+        canvas.setMatrix(scaleMatrix);
+        canvas.drawBitmap(bmp, middleX - bmp.getWidth() / 2,
+                middleY - bmp.getHeight() / 2, new Paint(Paint.FILTER_BITMAP_FLAG));
+        bmp.recycle();
+
+        if (srcFile != null) {
+            int orientation = ImageUtils.getImageAngle(srcFile);
+            if (orientation != 0) {
+                scaledBitmap = ImageUtils.rotateBitmap(scaledBitmap, ImageUtils.getImageAngle(srcFile));
+            }
+        }
+
+        return scaledBitmap;
     }
 
 }

@@ -2,7 +2,7 @@ package me.shouheng.compress.strategy.luban;
 
 import android.os.AsyncTask;
 import io.reactivex.Flowable;
-import me.shouheng.compress.strategy.Config;
+import me.shouheng.compress.strategy.config.Config;
 import me.shouheng.compress.strategy.SimpleStrategy;
 import me.shouheng.compress.utils.FileUtils;
 import me.shouheng.compress.utils.ImageUtils;

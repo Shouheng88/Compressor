@@ -85,7 +85,6 @@
                         android:id="@+id/btn_capture"
                         android:text="@string/text_capture"
                         android:textAllCaps="false"
-                        android:onClick="capture"
                         app:layout_constraintHorizontal_chainStyle="spread"
                         android:layout_weight="1"
                         android:layout_width="0dp"
@@ -95,7 +94,6 @@
                         android:id="@+id/btn_choose"
                         android:text="@string/text_choose"
                         android:textAllCaps="false"
-                        android:onClick="choose"
                         android:layout_weight="1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"/>
@@ -165,7 +163,6 @@
                         android:id="@+id/btn_luban"
                         android:text="@string/text_compress_by_luban"
                         android:textAllCaps="false"
-                        android:onClick="luban"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
@@ -195,9 +192,28 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
-                <RadioGroup
+                <LinearLayout
                         android:orientation="horizontal"
-                        android:id="@+id/rg_c_type"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                    <TextView
+                            android:text="@string/text_source_type"
+                            android:layout_marginLeft="10dp"
+                            android:textColor="@android:color/black"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                    <android.support.v7.widget.AppCompatSpinner
+                            android:id="@+id/asp_source_type"
+                            android:entries="@array/source_type"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
@@ -208,20 +224,13 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
 
-                    <RadioButton
-                            android:id="@+id/rb_c_launch"
-                            android:text="@string/text_launch_type_launch"
-                            android:checked="true"
+                    <android.support.v7.widget.AppCompatSpinner
+                            android:id="@+id/asp_compressor_launch"
+                            android:entries="@array/launch_type"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
 
-                    <RadioButton
-                            android:id="@+id/rb_c_flowable"
-                            android:text="@string/text_launch_type_flowable"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-
-                </RadioGroup>
+                </LinearLayout>
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
 
@@ -260,7 +269,6 @@
                         android:id="@+id/btn_compressor"
                         android:text="@string/text_compress_by_compressor"
                         android:textAllCaps="false"
-                        android:onClick="compressor"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
@@ -293,7 +301,6 @@
                         android:id="@+id/btn_custom"
                         android:text="@string/text_compress_by_custom"
                         android:textAllCaps="false"
-                        android:onClick="custom"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 

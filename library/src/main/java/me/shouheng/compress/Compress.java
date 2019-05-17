@@ -7,7 +7,7 @@ import android.text.TextUtils;
 import me.shouheng.compress.listener.CompressListener;
 import me.shouheng.compress.naming.CacheNameFactory;
 import me.shouheng.compress.naming.DefaultNameFactory;
-import me.shouheng.compress.strategy.Config;
+import me.shouheng.compress.strategy.config.Config;
 import me.shouheng.compress.utils.FileUtils;
 
 import java.io.File;
@@ -23,10 +23,12 @@ import java.io.File;
  *             .launch()
  * </code>
  */
-public class Compress {
+public final class Compress {
 
     private Context context;
     private File srcFile;
+    private Bitmap srcBitmap;
+    private byte[] srcData;
     private Bitmap.CompressFormat format = Config.DEFAULT_COMPRESS_FORMAT;
     private int quality = Config.DEFAULT_COMPRESS_QUALITY;
     private String targetDir;
@@ -34,20 +36,23 @@ public class Compress {
     private CacheNameFactory cacheNameFactory;
     private CompressListener compressListener;
 
-    /**
-     * Set the context and the image file to compress.
-     *
-     * @param context the context
-     * @param file the image file
-     * @return the compress instance
-     */
     public static Compress with(Context context, File file) {
-        return new Compress(context, file);
+        return new Compress(context, file, null, null);
     }
 
-    private Compress(Context context, File file) {
+    public static Compress with(Context context, Bitmap srcBitmap) {
+        return new Compress(context, null, srcBitmap, null);
+    }
+
+    public static Compress with(Context context, byte[] srcData) {
+        return new Compress(context, null, null, srcData);
+    }
+
+    private Compress(Context context, File file, Bitmap srcBitmap, byte[] srcData) {
         this.context = context;
         this.srcFile = file;
+        this.srcBitmap = srcBitmap;
+        this.srcData = srcData;
         this.cacheNameFactory = DefaultNameFactory.getFactory();
     }
 
@@ -118,6 +123,8 @@ public class Compress {
      */
     public <T extends AbstractStrategy> T strategy(T t) {
         t.setSrcFile(srcFile);
+        t.setSrcBitmap(srcBitmap);
+        t.setSrcData(srcData);
         t.setFormat(format);
         t.setQuality(quality);
         t.setOutFile(getOutFile());

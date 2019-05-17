@@ -1,8 +1,8 @@
-package me.shouheng.compress.strategy;
+package me.shouheng.compress.strategy.config;
 
 import android.graphics.Bitmap;
 
-import static me.shouheng.compress.strategy.ScaleMode.SCALE_LARGER;
+import static me.shouheng.compress.strategy.config.ScaleMode.SCALE_LARGER;
 
 /**
  * The basic configuration for compress strategy.
