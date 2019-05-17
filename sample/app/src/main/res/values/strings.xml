@@ -19,6 +19,7 @@
 
     <string name="text_compress_region_compressor">Compressor Compress Strategy Region: </string>
     <string name="text_compress_scale_mode">Scale mode : </string>
+    <string name="text_compress_color_mode">Color config : </string>
     <string name="text_compress_scale_larger">Scale Larger</string>
     <string name="text_compress_scale_smaller">Scale Smaller</string>
     <string name="text_compress_scale_width">Scale Width</string>
@@ -51,6 +52,13 @@
         <item>ARGB_4444</item>
         <item>RGBA_F16</item>
         <item>HARDWARE</item>
+    </array>
+
+    <array name="scale_config">
+        <item>SCALE_LARGER</item>
+        <item>SCALE_SMALLER</item>
+        <item>SCALE_WIDTH</item>
+        <item>SCALE_HEIGHT</item>
     </array>
 
 </resources>

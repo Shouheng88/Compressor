@@ -37,6 +37,8 @@ class MainActivity : BaseActivity() {
 
     private lateinit var originalFile: File
     private var config = Bitmap.Config.ALPHA_8
+    private var scaleMode = ScaleMode.SCALE_LARGER
+
     @RequiresApi(Build.VERSION_CODES.O)
     private var configArray = arrayOf(
         Bitmap.Config.ARGB_8888,
@@ -45,6 +47,13 @@ class MainActivity : BaseActivity() {
         Bitmap.Config.ARGB_4444,
         Bitmap.Config.RGBA_F16,
         Bitmap.Config.HARDWARE)
+
+    private var scaleArray = arrayOf(
+        ScaleMode.SCALE_LARGER,
+        ScaleMode.SCALE_SMALLER,
+        ScaleMode.SCALE_WIDTH,
+        ScaleMode.SCALE_HEIGHT
+    )
 
     private lateinit var binding: ActivityMainBinding
 
@@ -62,7 +71,7 @@ class MainActivity : BaseActivity() {
             }
             true
         }
-        binding.asp.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.aspColor.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     config = configArray[position]
@@ -71,6 +80,15 @@ class MainActivity : BaseActivity() {
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 // nothing
+            }
+        }
+        binding.aspScale.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // nothing
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                scaleMode = scaleArray[position]
             }
         }
 
@@ -84,7 +102,7 @@ class MainActivity : BaseActivity() {
             val file = File(filePath)
 
             // connect compressor object
-            LogLog.d("$config")
+            LogLog.d("Current configuration: \nConfig: $config\nScaleMode: $scaleMode")
 
             // add scale mode
             val compressor = Compress.with(this, file)
@@ -111,13 +129,7 @@ class MainActivity : BaseActivity() {
                 .setConfig(config)
                 .setMaxHeight(100f)
                 .setMaxWidth(100f)
-            if (binding.rbScaleWidth.isChecked) {
-                compressor.setScaleMode(ScaleMode.SCALE_WIDTH)
-            } else if (binding.rbScaleHeight.isChecked) {
-                compressor.setScaleMode(ScaleMode.SCALE_HEIGHT)
-            } else if (binding.rbScaleSmaller.isChecked) {
-                compressor.setScaleMode(ScaleMode.SCALE_SMALLER)
-            }
+                .setScaleMode(scaleMode)
 
             // launch as flowable or luanch
             if (binding.rbCFlowable.isChecked) {
@@ -125,7 +137,11 @@ class MainActivity : BaseActivity() {
                         .asFlowable()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe { displayResult(it.absolutePath) }
+                        .subscribe({
+                            displayResult(it.absolutePath)
+                        }, {
+                            Toast.makeText(this@MainActivity, "Compress Error ：$it", Toast.LENGTH_SHORT).show()
+                        })
             } else {
                 compressor.launch()
             }
@@ -168,7 +184,11 @@ class MainActivity : BaseActivity() {
                 val d = luban.asFlowable()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { displayResult(it.absolutePath) }
+                    .subscribe({
+                        displayResult(it.absolutePath)
+                    }, {
+                        Toast.makeText(this@MainActivity, "Compress Error ：$it", Toast.LENGTH_SHORT).show()
+                    })
             } else {
                 luban.launch()
             }
