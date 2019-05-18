@@ -1,157 +1,223 @@
-# Easy-Compressor 简单、易用的 Android 图片压缩框架
+# 一款现代、高效的 Android 图片压缩框架
 
-本项目主要基于 Android 自带的图片压缩 API 进行封装，结合了 [Luban](https://github.com/Curzibn/Luban) 和 [Compressor](https://github.com/zetbaitsu/Compressor) 的优点，同时提供了用户自定义压缩策略的接口。该项目的主要目的在于，统一图片压缩框库的实现，集成常用的两种图片压缩算法，让你以更低的成本集成图片压缩功能到自己的项目中。
+本项目主要基于 Android 自带的图片压缩 API 进行实现，提供了开源压缩方案 [Luban](https://github.com/Curzibn/Luban) 和 [Compressor](https://github.com/zetbaitsu/Compressor) 的实现，解决了单一 Fie 类型数据源的问题，并在它们的基础之上进行了功能上的拓展。该项目的主要目的在于：提供一个统一图片压缩框库的实现，集成常用的两种图片压缩算法，让你以更低的成本集成图片压缩功能到自己的项目中。
 
-## 1、Github 上的开源的图片压缩库
+## 1、项目背景：开源的图片压缩库
 
 现在 Github 上的图片压缩框架主要有 Luban 和 Compressor 两个。Star 的数量也比较高，一个 9K，另一个 4K. 但是，这两个图片压缩的库有各自的优点和缺点。下面我们通过一个表格总结一下：
 
 |框架|优点|缺点|
 |:-:|:-|:-|
-|Luban|据说是根据微信图片压缩逆推的算法|1.只适用于一般的图片展示的场景，无法对图片的尺寸进行精准压缩；2.内部封装 AsyncTaks 来进行异步的图片压缩，对于 RxJava 支持不好。|
-|Compressor|1.可以对图片的尺寸进行压缩；2.支持 RxJava。|1.尺寸压缩的场景有限，如果有特别的需求，则需要手动修改源代码；2.图片压缩采样的时候计算有问题，导致采样后的图片尺寸总是小于我们指定的尺寸|
+|[Luban](https://github.com/Curzibn/Luban)|据说是根据微信图片压缩逆推的算法|1.只适用于一般的图片展示的场景，无法对图片的尺寸进行精准压缩；2.内部封装 AsyncTaks 来进行异步的图片压缩，对于 RxJava 支持不好。3.只支持单一 File 类型数据源和结果类型，应用场景有限。|
+|[Compressor](https://github.com/zetbaitsu/Compressor)|1.可以对图片的尺寸进行精准压缩；2.支持 RxJava。|1.尺寸压缩的场景有限，如果有特别的需求，则需要手动修改源代码；2.图片压缩采样的时候计算有问题，导致采样后的图片尺寸总是小于我们指定的尺寸；3.只支持单一 File 类型数据源和结果类型，应用场景有限。|
 
-上面的图表已经总结得很详细了。所以，根据上面的两个库各自的优缺点，我们打算开发一个新的图片压缩框架。它满足下面的功能：
+以上，我们总结了 Github 上面的两款比较受欢迎的开源图片压缩库的优缺点。正如我们上面所说，我们希望能够综合它们的优点，并且解决以上两款开源库设计不好的地方。因此，你可以通过下文来了解我们的库所提供的功能，以及如何在您的项目中接入我们的压缩方案。
 
-1. 支持 RxJava：我们可以像使用 Compressor 的时候那样，指定图片压缩的线程和结果监听的线程；
-2. 支持 Luban 压缩算法：Luban 压缩算法核心的部分只在于 inSampleSize 的计算，因此，我们可以很容易得将其集成到我们的新的库中。之所以加入 Luban，是为了让我们的库可以适用于一般图片展示的场景。用户无需指定图片的尺寸，用起来省心省力。
-3. 支持 Compressor 压缩算法同时指定更多的参数：Compressor 压缩算法就是我们上述提到的三种压缩算法的总和。不过，当要压缩的宽高比与原始图片的宽高比不一致的时候，它只提供了一种情景。下文中介绍我们框架的时候会说明进行更详细的说明。当然，你可以在调用框架的方法之前主动去计算出一个宽高比，但是你需要把图片压缩的第一个阶段主动走一遍，费心费力。
-4. 提供用户自定义压缩算法的接口：我们希望设计的库可以允许用户自定义压缩策略。在想要替换图片压缩算法的时候，通过链式调用的一个方法直接更换策略即可。即，我们希望能够让用户以最低的成本替换项目中的图片压缩算法。
+## 2、功能和特性
 
-## 2、项目整体架构
+目前，我们的库已经支持了下面的功能，在后面的介绍中，我们会介绍如何在项目中进行详细配置和使用：
 
-以下是我们的图片压缩框架的整体架构，这里我们只列举除了其中核心的部分代码。这里的 Compress 是我们的链式调用的起点，我们可以用它来指定图片压缩的基本参数。然后，当我们使用它的 `strategy()` 方法之后，方法将进入到图片压缩策略中，此时，我们继续链式调用压缩策略的自定义方法，个性化地设置各压缩策略自己的参数：
+- **支持 Luban 压缩方案**：据介绍这是微信逆推的压缩算法，它在我们的项目中只作为一种可选的压缩方案，除此之外您还可以使用 Compressor 进行压缩，以及自定义压缩策略。
 
-![项目整体架构](https://user-gold-cdn.xitu.io/2019/3/12/169728529c5303b3?w=1022&h=534&f=png&s=29775)
+- **支持 Compressor 压缩方案**：这种压缩方案综合了 Android 自带的三种压缩方式，可以对压缩结果的尺寸进行精确的控制。此外，在我们的项目中，我们对这种压缩方案的功能进行了拓展，不仅支持了颜色通道的选择，还提供了多种可选的策略，用来对尺寸进行更详细的配置。
+- **支持 RxJava 的方式进行压缩**：使用 RxJava 的方式，您可以任意指定压缩任务和结果回调任务所在的线程，在我们的库中，我们提供了一个 Flowable 类型的对象，您可以用它来进行后续的处理。
+- **支持 AsyncTask + 回调的压缩方式**：这种方式通过使用 AsyncTask 在后台线程中执行压缩任务，当获取到压缩结果的时候通过 Handler 在主线程中返回压缩结果。
+- **提供了同步的压缩方式**：当然，有时候我们并不需要使用回调或者 RxJava 执行异步任务。比如，当我们本身已经处于后台线程的时候，我们希望的只是在当前线程中直接执行压缩任务并拿到压缩结果。因此，为了让我们的库适用于更多的应用场景，我们提出了这种压缩方案。
+- **支持多种数据源**：在上面的两款开源库中，要求传入的资源类型是 File。这就意味着，当我们从相机中获取到原始的图片信息（通常是字节数组）的时候，我们不得不先将其写入到文件系统中，然后获取到 File 的时候再进行压缩。这是没必要的，并且无疑地，会带来性能上的损耗。因此，为了能让我们的库应用到更多的场景中，我们支持了多种数据源。目前支持的数据源包括：文件类型 File，原始图片信息 byte[] 以及 Bitmap。
+- **支持多种结果类型**：以上两款开源库还存在一个问题，即返回的结果的类型也只支持 File 类型。但很多时候，我们希望传入的是 Bitmap，处理之后传出的结果也是 Bitmap. 因此，为了让我们的库适用于这种场景，我们也支持 Bitmap 类型的返回结果。
+- **提供用户自定义压缩算法的接口**：我们希望设计的库可以允许用户自定义压缩策略。在想要替换图片压缩算法的时候，通过链式调用的一个方法直接更换策略即可。即，我们希望能够让用户以最低的成本替换项目中的图片压缩算法。
 
-这里的所有的压缩策略都继承自抽线的基类 AbstractStrategy，它提供了两个默认的实现 Luban 和 Compressor. 接口  CompressListener 和 CacheNameFactory 分别用来监听图片压缩进度和自定义压缩的图片的名称。下面的三个是图片相关的工具类，用户可以调用它们来实现自己压缩策略。
+想要进一步了解该库的特性和功能，你还可以使用我们提供的示例 [APK](resources/app-debug.apk)
+
+
+[<div align="center"><img height="300" src="resources/sample_preview.jpg" alt="示例程序预览图"/></div>](resources/app-debug.apk)
+
 
 ## 3、使用
 
-首先，在项目的 Gradle 中加入我的 jcenter仓库：
+### 3.1 在 Gradle 中引用我们的库
 
-    repositories {
-        jcenter()
-    }
+在项目中接入我们的库是非常简单的。首先，在项目的 Gradle 中加入 jcenter仓库：
 
-然后，在你的项目的依赖中，添加该库的依赖：
-
-    implementation 'me.shouheng.compressor:compressor:1.0.0'
-
-然后，就可以在项目中使用了。你可以参考 Sample 项目的使用方式。不过，下面我们还是对它的一些 API 做简单的说明。
-
-### 4.1 Luban 的使用
-
-下面是 Luban 压缩策略的使用示例，它与 Luban 库的使用类似。只是在 Luban 的库的基础上，我们增加了一个 copy 的选项，用来表示当图片因为小于指定的大小而没有被压缩之后，是否将原始的图片拷贝到指定的目录。因为，比如当你使用回调获取图片压缩结果的时候，如果按照 Luban 库的逻辑，你得到的是原始的图片，所以，此时你需要额外进行判断。因此，我们增加了这个布尔类型的参数，你可以通过它指定将原始文件进行拷贝，这样你就不需要在回调中对是否是原始图片进行判断了。
-
-```kotlin
-    // 在 Compress 的 with() 方法中指定 Context 和 要压缩文件 File
-    val luban = Compress.with(this, file)
-        // 这里添加一个回调，如果你不使用 RxJava，那么可以用它来处理压缩的结果
-        .setCompressListener(object : CompressListener{
-            override fun onStart() {
-                LogUtils.d(Thread.currentThread().toString())
-                Toast.makeText(this@MainActivity, "Compress Start", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onSuccess(result: File?) {
-                LogUtils.d(Thread.currentThread().toString())
-                displayResult(result?.absolutePath)
-                Toast.makeText(this@MainActivity, "Compress Success : $result", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onError(throwable: Throwable?) {
-                LogUtils.d(Thread.currentThread().toString())
-                Toast.makeText(this@MainActivity, "Compress Error ：$throwable", Toast.LENGTH_SHORT).show()
-            }
-        })
-        // 压缩图片的名称工厂方法，用来指定压缩结果的文件名
-        .setCacheNameFactory { System.currentTimeMillis().toString() }
-        // 图片的质量
-        .setQuality(80)
-        // 上面基本的配置完了，下面指定图片的压缩策略为 Luban
-        .strategy(Strategies.luban())
-        // 指定如果图片小于等于 100K 就不压缩了，这里的参数 copy 表示，如果不压缩的话要不要拷贝文件
-        .setIgnoreSize(100, copy)
-
-        // 按上面那样得到了 Luban 实例之后有下面两种方式启动图片压缩
-        // 启动方式 1：使用 RxJava 进行处理
-        val d = luban.asFlowable()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { displayResult(it.absolutePath) }
-    
-        // 启动方式 2：直接启动，此时使用内部封装的 AsyncTask 进行压缩，压缩结果只能在上面的回调中进行处理了
-        luban.launch()
-```
-
-### 4.2 Compressor 的使用
-
-下面是 Compressor 压缩策略的基本的使用，在调用 `strategy()` 方法指定压缩策略之前，你的任务与 Luban 一致。所以，如果你需要更换图片压缩算法的时候，直接使用 `strategy()` 方法更换策略即可，前面部分的逻辑无需改动，因此，可以降低你更换压缩策略的成本。
-
-```kotlin
-    val compressor = Compress.with(this, file)
-        .setQuality(60)
-        .setTargetDir("")
-        .setCompressListener(object : CompressListener {
-            override fun onStart() {
-                LogUtils.d(Thread.currentThread().toString())
-                Toast.makeText(this@MainActivity, "Compress Start", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onSuccess(result: File?) {
-                LogUtils.d(Thread.currentThread().toString())
-                displayResult(result?.absolutePath)
-                Toast.makeText(this@MainActivity, "Compress Success : $result", Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onError(throwable: Throwable?) {
-                LogUtils.d(Thread.currentThread().toString())
-                Toast.makeText(this@MainActivity, "Compress Error ：$throwable", Toast.LENGTH_SHORT).show()
-            }
-        })
-        .strategy(Strategies.compressor())
-        .setMaxHeight(100f)
-        .setMaxWidth(100f)
-        .setScaleMode(Configuration.SCALE_SMALLER)
-        .launch()
-```
-
-这里的 `setMaxHeight(100f)` 和 `setMaxWidth(100f)` 用来表示图片压缩的目标大小。具体的大小是如何计算的呢？在 Compressor 库中你是无法确定的，但是在我们的库中，你可以通过 `setScaleMode()` 方法来指定。这个方法接收一个整数类型的枚举，它的取值范围有 4 个，即 `SCALE_LARGER`, `SCALE_SMALLER`, `SCALE_WIDTH` 和 `SCALE_HEIGHT`，它们具体的含义我们会进行详细说明。这里我们默认的压缩方式是 SCALE_LARGER，也就是 Compressor 库的压缩方式。那么这四个参数分别是什么含义呢？
-
-这里我们以一个例子来说明，假设有一个图片的宽度是 1000，高度是 500，简写作 (W:1000, H:500)，通过 `setMaxHeight()` 和 `setMaxWidth()` 指定的参数均为 100，那么，就称目标图片的尺寸，宽度是 100，高度是 100，简写作 (W:100, H:100)。那么按照上面的四种压缩方式，最终的结果将是：
-
-- **SCALE_LARGER**：对高度和长度中较大的一个进行压缩，另一个自适应，因此压缩结果是 (W:100, H:50). 也就是说，因为原始图片宽高比 2:1，我们需要保持这个宽高比之后再压缩。而目标宽高比是 1:1. 而原图的宽度比较大，所以，我们选择将宽度作为压缩的基准，宽度缩小 10 倍，高度也缩小 10 倍。这是 Compressor 库的默认压缩策略，显然它只是优先使得到的图片更小。这在一般情景中没有问题，但是当你想把短边控制在 100 就无计可施了（需要计算之后再传参），此时可以使用 SCALE_SMALLER。
-- **SCALE_SMALLER**：对高度和长度中较大的一个进行压缩，另一个自适应，因此压缩结果是 (W:200, H:100). 也就是，高度缩小 5 倍之后，达到目标 100，然后宽度缩小 5 倍，达到 200. 
-- **SCALE_WIDTH**：对宽度进行压缩，高度自适应。因此得到的结果与 SCALE_LARGER 一致。
-- **SCALE_HEIGHT**：对高度进行压缩，宽度自适应，因此得到的结果与 SCALE_HEIGHT 一致。
-
-### 4.3 自定义策略
-
-自定义一个图片压缩策略也是很简单的，你可以通过继承 SimpleStrategy 或者直接继承 AbstractStrategy 来实现：
-
-```kotlin
-class MySimpleStrategy: SimpleStrategy() {
-
-    override fun calInSampleSize(): Int {
-        return 2
-    }
-
-    fun myLogic(): MySimpleStrategy {
-        return this
-    }
-
+```gradle
+repositories {
+    jcenter()
 }
 ```
 
-注意下，如果想要实现链式的调用，自定义压缩策略的方法需要返回自身。
+然后，在项目的依赖中添加该库的依赖：
+
+```gradle
+implementation 'me.shouheng.compressor:compressor:1.3.0'
+```
+
+### 3.2 使用我们库进行压缩
+
+详细的用法你可以参考我们提供的 Sample 程序，这里我们介绍下使用我们库的几个要点：
+
+首先，你要使用 Compress 类的静态方法获取一个 Compress 实例，这是所有配置的起点。针对不同的数据源，你需要调用它的三个不同的工厂方法：
+
+```kotlin
+    // 使用文件 File 获取 Compress 实例
+    val compress = Compress.with(this, file)
+    // 使用图片的字节数组获取 Compress 实例
+    val compress = Compress.with(this, byteArray)
+    // 使用图片的 Bitmap 获取 Compress 实例
+    val compress = Compress.with(this, bitmap)
+```
+
+然后，你可以调用 Compress 的实例方法来对压缩的参数进行基本的配置：
+
+```kotlin
+    compress
+        // 指定要求的图片的质量
+        .setQuality(60)
+        // 指定文件的输出目录（如果返回结果不是 File 的会，无效）
+        .setTargetDir(PathUtils.getExternalPicturesPath())
+        // 指定压缩结果回调（如哦返回结果不是 File 则不会被回调到）
+        .setCompressListener(object : CompressListener {
+            override fun onStart() {
+                LogUtils.d(Thread.currentThread().toString())
+                ToastUtils.showShort("Start [Compressor,File]")
+            }
+    
+            override fun onSuccess(result: File?) {
+                LogUtils.d(Thread.currentThread().toString())
+                displayResult(result?.absolutePath)
+                ToastUtils.showShort("Success [Compressor,File] : $result")
+            }
+    
+            override fun onError(throwable: Throwable?) {
+                LogUtils.d(Thread.currentThread().toString())
+                ToastUtils.showShort("Error [Compressor,File] : $throwable")
+            }
+        })
+```
+
+以上是使用 Compress 进行基本的配置，上面我们给出了一些注释。关于各个方法的含义，后续我们会进行详细的介绍。
+
+根据上述配置，我们就得到了一个 Compress 对象。然后，我们需要指定一个图片压缩策略，并调用压缩策略的方法进行更详细的配置。以 Compressor 为例，我们可以调用 Strategies.compressor() 方法获取它的实例：
+
+```kotlin
+val compressor = compress
+        .strategy(Strategies.compressor())
+        .setConfig(config)
+        .setMaxHeight(100f)
+        .setMaxWidth(100f)
+        .setScaleMode(scaleMode)
+```
+
+按照上述配置，我们就拿到了 Compressor 实例。当然如果你的配置使用比较频繁，为了简化代码，你可以把这些配置过程放在一个工具方法中，而无需每次都进行这些配置。
+
+下面就是触发图片压缩并获取压缩结果的过程了。
+
+上面我们也提到过，针对 File 类型和 Bitmap 类型的返回结果，我们提供了两个方案。默认的返回类型是 File，为了得到 Bitmap 类型的结果，你只需要调用一下 Compressor 实例的 `asBitmap()` 方法，这样整个流程就‘拐’到了 Bitmap 的构建中去了。
+
+最终触发图片压缩有三种方式，
+
+```kotlin
+    // 方式 1：使用 AsyncTask 压缩，此时只能通过之前的回调获取压缩结果
+    compressor.launch()
+    // 方式 2：将压缩任务转换成 Flowable，使用 RxJava 指定任务的线程和获取结果的线程
+    val d = compressor
+        .asFlowable()
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe({
+            ToastUtils.showShort("Success [Compressor,File,Flowable] $it")
+            displayResult(it.absolutePath)
+        }, {
+            ToastUtils.showShort("Error [Compressor,File,Flowable] : $it")
+        })
+    // 方式 3：直接在当前线程中获取返回结果（同步，阻塞）
+    val resultFile = compressor.get()
+```
+
+对于 Luban 压缩方式的使用与之类似，只需要在指定压缩策略的那一步中将策略替换成 luban 即可。另外，对于自定义图片压缩的方式也是类似的，只需要在指定策略的那一步骤中指定即可。
+
+因此，如果使用的是 RxJava 的方式获取压缩结果，并且输入类型是 File，输出类型是 Bitmap，整个压缩的流程将是下面这样：
+
+```kotlin
+    val compressor = Compress.with(this@MainActivity, file)
+        .strategy(Strategies.compressor())
+        .setConfig(config)
+        .setMaxHeight(100f)
+        .setMaxWidth(100f)
+        .setScaleMode(scaleMode)
+        .asBitmap()
+        .asFlowable()
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe({
+            ToastUtils.showShort("Success [Compressor,Bitmap,Flowable] $it")
+            displayResult(it)
+        }, {
+            ToastUtils.showShort("Error [Compressor,Bitmap,Flowable] : $it")
+        })
+```
+
+### 3.3 你可能需要注意的事项
+
+- 如果你期望返回的结果是 Bitmap，那么下面这些方法传入的参数将不会起作用：
+
+    - `setQuality(/*...*/)`：用来指定输出图片的质量，因为我们在调用 Bitmap.compress() 方法的时候才能用到该参数，因此它不会起作用
+    - `setTargetDir(/*...*/)`：用来指定输出文件的位置
+    - `setCompressListener(/*...*/)`：用来获取文件的压缩结果的回调
+
+- 当你使用 Luban 算法压缩 Bitmap 的时候，内部会采用类似于 Compressor 的压缩逻辑，但是输出的结果与传入 File 类型时一致。这是因为 Luban 的逻辑无非就是用来采样，而采样是在加载到内存中的时候进行的，因为输入本身已经是 Bitmap，因此无法按照原来的逻辑进行压缩。
+
+- Luban 不支持 Bitmap 的色彩配置，因为本身没有创建 Bitmap。对于 Compressor 的色彩，虽然所有参数都可以使用，但是在使用的时候可能会出现不支持的情况。此时，不会导致程序 Crash，错误的信息会通过回调或者 RxJava 回调出来。
+
+- 1.0.0 到 1.3.0 的迁移：我们已经尽可能适配之前的方案，但是仍然有一部分内容我们做了调整。您可以按照下面的步骤做迁移工作：
+
+    - Compressor 的压缩策略从 Configuration 中移动到了 ScaleMode 中。
+    - 重命名 Configuration 类为 Config，因为它可能会与您项目中其他的代码命名冲突而不得不指定包名称。
+    - 一些工具类命名调整，您的项目中一般不会用到它们，但是如果用到了注意调整下名称。
+
+## 4、项目资料
+
+如果您对该项目感兴趣并且希望为该项目共享您的代码，那么您可以通过下面的一些资料来了解相关的内容：
+
+1. 项目整体的架构设计：[https://www.processon.com/view/link/5cdfb769e4b00528648784b7](https://www.processon.com/view/link/5cdfb769e4b00528648784b7)
+2. Android 图片压缩 API 的介绍，该项目的简介等：[《开源一个 Android 图片压缩框架》](https://juejin.im/post/5c87d01f6fb9a049b7813784)
+3. 我们提供的示例 APK：[app-debug.apk](resources/app-debug.apk)
 
 ## 更新日志
 
+- 版本 1.3.0：
+
+    - 增加了多种数据源的支持
+    - 增加了 Bitmap 返回类型的支持
+    - 增加了同步压缩
+    - 增加了色彩的支持
+    - 部分代码重构，Compressor 压缩策略参数位置调整
+    - 项目结构调整
+
 - 版本 1.0.0：修改了 Compressor 压缩模式图片无法旋转的问题
+
+## 关于作者
+
+你可以通过访问下面的链接来获取作者的信息：
+
+1. Twitter: https://twitter.com/shouheng_wang
+2. 微博：https://weibo.com/5401152113/profile?rightmod=1&wvr=6&mod=personinfo
+3. Github: https://github.com/Shouheng88
+4. 掘金：https://juejin.im/user/585555e11b69e6006c907a2a
 
 ## License
 
-> Apache 2.0    
-> Developed with passion and love by WngShhng.
+```
+Copyright (c) 2019 WngShhng.
 
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
