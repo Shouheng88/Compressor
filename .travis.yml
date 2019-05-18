@@ -1,0 +1,16 @@
+language: android
+jdk: oraclejdk8
+sudo: false
+android:
+  components:
+    - tools
+    - tools
+    - build-tools-28.0.0
+    - android-28
+    - extra-google-m2repository
+    - extra-android-m2repository
+  licenses:
+    - android-sdk-preview-license-.+
+    - android-sdk-license-.+
+    - google-gdk-license-.+
+script: ./sample/gradlew build
