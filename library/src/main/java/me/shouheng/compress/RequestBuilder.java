@@ -6,6 +6,13 @@ import android.os.Looper;
 import android.os.Message;
 import io.reactivex.Flowable;
 
+/**
+ * The request builder object. Used to build the compress request. It contains many useful
+ * methods like {@link #notifyCompressSuccess(Object)}.
+ * This class has two children, {@link AbstractStrategy} and {@link me.shouheng.compress.request.BitmapBuilder}
+ *
+ * @param <T> the required result type
+ */
 public abstract class RequestBuilder<T> implements Handler.Callback {
 
     private static final int MSG_COMPRESS_SUCCESS       = 0;
@@ -51,8 +58,23 @@ public abstract class RequestBuilder<T> implements Handler.Callback {
         this.abstractStrategy = abstractStrategy;
     }
 
+    /**
+     * Get bitmap from given strategy. The strategy must implement this method.
+     * Mainly this method is used to get bitmap in {@link RequestBuilder}
+     * like {@link me.shouheng.compress.request.BitmapBuilder} to get bitmap from real compressor
+     * like luban and compressor and transform the bitmap to required type.
+     *
+     * @return the bitmap
+     */
     protected Bitmap getBitmap() {
-        return abstractStrategy.getBitmap();
+        if (abstractStrategy == null) {
+            throw new IllegalStateException("The real compress strategy is null.");
+        }
+        Bitmap bitmap = abstractStrategy.getBitmap();
+        if (bitmap == null) {
+            throw new IllegalStateException("The compress strategy must implement #getBitmap() method.");
+        }
+        return bitmap;
     }
 
     protected void notifyCompressStart() {

@@ -32,7 +32,7 @@ public class Luban extends SimpleStrategy {
 
     /**
      * The file won't be compressed if the image size is less than this value.
-     * Note that the original file will be returned from {@link me.shouheng.compress.listener.CompressListener#onSuccess(File)}
+     * Note that the original file will be returned from {@link me.shouheng.compress.listener.CompressListener}
      * and {@link #asFlowable()}, if copyWhenIgnore was false. Otherwise the original file will be copied to the destination.
      *
      * @param ignoreSize  the size to ignore.

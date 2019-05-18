@@ -55,6 +55,11 @@ public abstract class AbstractStrategy extends RequestBuilder<File> implements H
         this.srcHeight = options.outHeight;
     }
 
+    @Override
+    protected Bitmap getBitmap() {
+        throw new IllegalStateException("This #getBitmap() method is not implemented by your strategy.");
+    }
+
     /*------------------------------------------- package level -------------------------------------------*/
 
     /* package */ void setSrcFile(File srcFile) {
