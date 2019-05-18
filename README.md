@@ -1,5 +1,9 @@
 # 一款现代、高效的 Android 图片压缩框架
 
+[![Build Status](https://www.travis-ci.org/Shouheng88/Compressor.svg?branch=master)](https://www.travis-ci.org/Shouheng88/Compressor)
+![SLicense](https://img.shields.io/hexpm/l/plug.svg)
+![Version](https://img.shields.io/maven-metadata/v/https/dl.bintray.com/easymark/Android/me/shouheng/compressor/compressor/maven-metadata.xml.svg)
+
 本项目主要基于 Android 自带的图片压缩 API 进行实现，提供了开源压缩方案 [Luban](https://github.com/Curzibn/Luban) 和 [Compressor](https://github.com/zetbaitsu/Compressor) 的实现，解决了单一 Fie 类型数据源的问题，并在它们的基础之上进行了功能上的拓展。该项目的主要目的在于：提供一个统一图片压缩框库的实现，集成常用的两种图片压缩算法，让你以更低的成本集成图片压缩功能到自己的项目中。
 
 ## 1、项目背景：开源的图片压缩库
