@@ -309,7 +309,7 @@ class MainActivity : BaseActivity() {
                     when(compressorLaunchType) {
                         LaunchType.LAUNCH -> {
                             bitmapBuilder
-                                .setCompressListener(object : RequestBuilder.CompressListener<Bitmap> {
+                                .setCompressListener(object : RequestBuilder.Callback<Bitmap> {
                                     override fun onStart() {
                                         LogUtils.d(Thread.currentThread().toString())
                                         ToastUtils.showShort("Start [Compressor,Bitmap,Launch]")
@@ -428,7 +428,7 @@ class MainActivity : BaseActivity() {
                     when(lubanLaunchType) {
                         LaunchType.LAUNCH -> {
                             bitmapBuilder
-                                .setCompressListener(object : RequestBuilder.CompressListener<Bitmap> {
+                                .setCompressListener(object : RequestBuilder.Callback<Bitmap> {
                                     override fun onStart() {
                                         LogUtils.d(Thread.currentThread().toString())
                                         ToastUtils.showShort("Start [Luban,Bitmap,Launch]")

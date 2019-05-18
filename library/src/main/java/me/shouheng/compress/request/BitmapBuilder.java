@@ -3,7 +3,6 @@ package me.shouheng.compress.request;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import io.reactivex.Flowable;
-import me.shouheng.compress.AbstractStrategy;
 import me.shouheng.compress.RequestBuilder;
 import me.shouheng.compress.utils.LogLog;
 
@@ -11,10 +10,7 @@ import java.util.concurrent.Callable;
 
 public class BitmapBuilder extends RequestBuilder<Bitmap> {
 
-    public BitmapBuilder(AbstractStrategy abstractStrategy) {
-        super(abstractStrategy);
-    }
-
+    @Override
     public Bitmap get() {
         Bitmap bitmap = null;
         try {
@@ -32,6 +28,7 @@ public class BitmapBuilder extends RequestBuilder<Bitmap> {
         return bitmap;
     }
 
+    @Override
     public Flowable<Bitmap> asFlowable() {
         return Flowable.defer(new Callable<Flowable<Bitmap>>() {
             @Override
@@ -56,6 +53,7 @@ public class BitmapBuilder extends RequestBuilder<Bitmap> {
         });
     }
 
+    @Override
     public void launch() {
         AsyncTask.SERIAL_EXECUTOR.execute(new Runnable() {
             @Override

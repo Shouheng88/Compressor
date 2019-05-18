@@ -1,31 +1,15 @@
 package me.shouheng.compress.listener;
 
+import me.shouheng.compress.RequestBuilder;
+
 import java.io.File;
 
 /**
- * The compress state callback.
+ * The compress state callback. This callback is used to listen to the file
+ * type result. Mainly used to
  *
  * @author WngShhng (shouheng2015@gmail.com)
  */
-public interface CompressListener {
-
-    /**
-     * Will be called when start to compress.
-     */
-    void onStart();
-
-    /**
-     * Will be called when finish compress.
-     *
-     * @param result the compressed image
-     */
-    void onSuccess(File result);
-
-    /**
-     * Will be called when error occurred.
-     *
-     * @param throwable the throwable exception
-     */
-    void onError(Throwable throwable);
+public interface CompressListener extends RequestBuilder.Callback<File> {
 
 }

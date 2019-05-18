@@ -12,16 +12,12 @@ public abstract class RequestBuilder<T> implements Handler.Callback {
     private static final int MSG_COMPRESS_START         = 1;
     private static final int MSG_COMPRESS_ERROR         = 2;
 
-    private CompressListener<T> compressListener;
+    private Callback<T> compressListener;
     private AbstractStrategy abstractStrategy;
-
-    public RequestBuilder(AbstractStrategy abstractStrategy) {
-        this.abstractStrategy = abstractStrategy;
-    }
 
     private Handler handler = new Handler(Looper.getMainLooper(), this);
 
-    public RequestBuilder<T> setCompressListener(CompressListener<T> compressListener) {
+    public RequestBuilder<T> setCompressListener(Callback<T> compressListener) {
         this.compressListener = compressListener;
         return this;
     }
@@ -51,6 +47,10 @@ public abstract class RequestBuilder<T> implements Handler.Callback {
         return false;
     }
 
+    protected void setAbstractStrategy(AbstractStrategy abstractStrategy) {
+        this.abstractStrategy = abstractStrategy;
+    }
+
     protected Bitmap getBitmap() {
         return abstractStrategy.getBitmap();
     }
@@ -67,7 +67,7 @@ public abstract class RequestBuilder<T> implements Handler.Callback {
         handler.sendMessage(handler.obtainMessage(MSG_COMPRESS_ERROR, throwable));
     }
 
-    public interface CompressListener<T> {
+    public interface Callback<T> {
         /**
          * Will be called when start to compress.
          */
