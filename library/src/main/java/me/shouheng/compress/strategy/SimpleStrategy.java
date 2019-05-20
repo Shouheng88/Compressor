@@ -7,6 +7,7 @@ import me.shouheng.compress.AbstractStrategy;
 import me.shouheng.compress.utils.ImageUtils;
 import me.shouheng.compress.utils.LogLog;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,7 +36,7 @@ public abstract class SimpleStrategy extends AbstractStrategy {
 
     @Override
     protected Bitmap getBitmap() {
-        return doCompress();
+        return compressByQuality();
     }
 
     @Override
@@ -92,9 +93,15 @@ public abstract class SimpleStrategy extends AbstractStrategy {
 
     /*------------------------------------------- inner level -------------------------------------------*/
 
+    /**
+     * Compress the bitmap and write it to file system (the target file).
+     *
+     * @return whether the compress logic is succeed.
+     * @throws IOException the io exception
+     */
     private boolean compressAndWrite() throws IOException {
-        Bitmap bitmap = doCompress();
-        if (bitmap != null) {
+        Bitmap bitmap = compressByScale();
+        if (!ImageUtils.isEmptyBitmap(bitmap)) {
             FileOutputStream fos = new FileOutputStream(outFile);
             bitmap.compress(format, quality, fos);
             fos.flush();
@@ -105,7 +112,26 @@ public abstract class SimpleStrategy extends AbstractStrategy {
         return true;
     }
 
-    private Bitmap doCompress() {
+    /**
+     * Compress the source bitmap by the required quality
+     *
+     * @return the compressed bitmap.
+     */
+    private Bitmap compressByQuality() {
+        Bitmap bitmap = compressByScale();
+        if (ImageUtils.isEmptyBitmap(bitmap)) return null;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(format, quality, baos);
+        byte[] bytes = baos.toByteArray();
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+    }
+
+    /**
+     * Compress the source bitmap by scaling it.
+     *
+     * @return the compressed bitmap
+     */
+    private Bitmap compressByScale() {
         prepareImageSizeInfo();
 
         int inSampleSize = calInSampleSize();

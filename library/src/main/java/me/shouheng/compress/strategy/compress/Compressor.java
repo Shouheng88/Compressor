@@ -9,6 +9,7 @@ import me.shouheng.compress.strategy.config.ScaleMode;
 import me.shouheng.compress.utils.ImageUtils;
 import me.shouheng.compress.utils.LogLog;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -142,7 +143,7 @@ public class Compressor extends AbstractStrategy {
 
     @Override
     protected Bitmap getBitmap() {
-        return compress();
+        return compressByQuality();
     }
 
     /*--------------------------------------- protected methods ------------------------------------------*/
@@ -242,9 +243,15 @@ public class Compressor extends AbstractStrategy {
 
     /*--------------------------------------- inner methods ------------------------------------------*/
 
+    /**
+     * Compress bitmap and save it to target file.
+     *
+     * @return is the full compress logic succeed.
+     * @throws IOException io exception
+     */
     private boolean compressAndWrite() throws IOException {
-        Bitmap bitmap = compress();
-        if (bitmap != null) {
+        Bitmap bitmap = compressByScale();
+        if (!ImageUtils.isEmptyBitmap(bitmap)) {
             FileOutputStream fos = new FileOutputStream(outFile);
             bitmap.compress(format, quality, fos);
             fos.flush();
@@ -255,12 +262,28 @@ public class Compressor extends AbstractStrategy {
         return true;
     }
 
-    private Bitmap compress() {
-        prepareImageSizeInfo();
-        return decodeBitmap();
+    /**
+     * Compress by quality, the bitmap will be compressed by scale first.
+     *
+     * @return the compressed bitmap
+     */
+    private Bitmap compressByQuality() {
+        Bitmap bitmap = compressByScale();
+        if (ImageUtils.isEmptyBitmap(bitmap)) return null;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(format, quality, baos);
+        byte[] bytes = baos.toByteArray();
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
-    private Bitmap decodeBitmap() {
+    /**
+     * Compress the source bitmap by scale.
+     *
+     * @return the compressed bitmap
+     */
+    private Bitmap compressByScale() {
+        prepareImageSizeInfo();
+
         float imgRatio = (float) srcWidth / (float) srcHeight;
         float reqRatio = maxWidth / maxHeight;
 

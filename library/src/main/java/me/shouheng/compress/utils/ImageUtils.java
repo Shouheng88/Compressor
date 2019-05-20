@@ -14,6 +14,31 @@ public final class ImageUtils {
     }
 
     /**
+     * Return whether given bitmap is empty: null or no pixel.
+     *
+     * @param src the source bitmap
+     * @return whether the bitmap is empty
+     */
+    public static boolean isEmptyBitmap(final Bitmap src) {
+        return src == null || src.getWidth() == 0 || src.getHeight() == 0;
+    }
+
+    /**
+     * Need the image compress according to the file size and the least compress size.
+     *
+     * @param filePath file path
+     * @param leastCompressSize least compress size
+     * @return true if need to compress
+     */
+    public static boolean needCompress(String filePath, int leastCompressSize) {
+        if (leastCompressSize > 0) {
+            File source = new File(filePath);
+            return source.exists() && source.length() > (leastCompressSize << 10);
+        }
+        return true;
+    }
+
+    /**
      * Get angle from image attribute.
      *
      * @param file the image file
@@ -38,21 +63,6 @@ public final class ImageUtils {
             e.printStackTrace();
         }
         return 0;
-    }
-
-    /**
-     * Need the image compress according to the file size and the least compress size.
-     *
-     * @param filePath file path
-     * @param leastCompressSize least compress size
-     * @return true if need to compress
-     */
-    public static boolean needCompress(String filePath, int leastCompressSize) {
-        if (leastCompressSize > 0) {
-            File source = new File(filePath);
-            return source.exists() && source.length() > (leastCompressSize << 10);
-        }
-        return true;
     }
 
     /**
