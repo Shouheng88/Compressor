@@ -540,18 +540,27 @@ class MainActivity : BaseActivity() {
         binding.tvResult.text = "Result:\nwidth: $actualWidth\nheight:$actualHeight\nsize:$size"
     }
 
+    /**
+     * Compress task launch type
+     */
     enum class LaunchType {
         LAUNCH,
         AS_FLOWABLE,
         GET
     }
 
+    /**
+     * Compress data source type
+     */
     enum class SourceType {
         FILE,
         BYTE_ARRAY,
         BITMAP
     }
 
+    /**
+     * Result type
+     */
     enum class ResultType {
         BITMAP,
         FILE

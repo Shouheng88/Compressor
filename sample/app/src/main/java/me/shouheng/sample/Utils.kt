@@ -6,6 +6,9 @@ import android.os.Build
 import android.support.v4.content.FileProvider
 import java.io.File
 
+/**
+ * Utils for app module
+ */
 class Utils {
 
     companion object {

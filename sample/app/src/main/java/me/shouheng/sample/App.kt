@@ -4,6 +4,9 @@ import android.app.Application
 import me.shouheng.compress.utils.LogLog
 import me.shouheng.utils.UtilsApp
 
+/**
+ * The custom application
+ */
 class App : Application() {
 
     override fun onCreate() {

@@ -7,7 +7,8 @@ import me.shouheng.utils.permission.callback.OnGetPermissionCallback
 import me.shouheng.utils.permission.callback.PermissionResultCallbackImpl
 
 /**
- * Created by WngShhng on 2018/5/24. */
+ * Created by WngShhng on 2018/5/24.
+ */
 abstract class BaseActivity : AppCompatActivity(), PermissionResultResolver {
 
     private var permissionCallback : OnGetPermissionCallback? = null

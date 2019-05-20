@@ -12,10 +12,6 @@ import static me.shouheng.compress.strategy.config.ScaleMode.SCALE_LARGER;
  */
 public final class Config {
 
-    private Config() {
-        throw new UnsupportedOperationException("u can't initialize me");
-    }
-
     public static final Bitmap.CompressFormat DEFAULT_COMPRESS_FORMAT = Bitmap.CompressFormat.JPEG;
 
     public static final int DEFAULT_COMPRESS_QUALITY = 75; // [0, 100]
@@ -32,5 +28,9 @@ public final class Config {
 
     @ScaleMode.Mode
     public static final int COMPRESSOR_DEFAULT_SCALE_MODE = SCALE_LARGER;
+
+    private Config() {
+        throw new UnsupportedOperationException("u can't initialize me");
+    }
 
 }
