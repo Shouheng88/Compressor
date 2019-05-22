@@ -19,7 +19,7 @@ public final class Config {
     public static final String DEFAULT_CACHE_DIRECTORY_NAME = "compressor";
 
     /**
-     * 是否自动回收源 Bitmap 的默认配置
+     * whether should the bitmap recycled automatically
      */
     public static final boolean DEFAULT_BITMAP_RECYCLE = true;
 
