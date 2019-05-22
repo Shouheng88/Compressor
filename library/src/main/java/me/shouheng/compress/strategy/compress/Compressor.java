@@ -336,7 +336,13 @@ public class Compressor extends AbstractStrategy {
         canvas.setMatrix(scaleMatrix);
         canvas.drawBitmap(bmp, middleX - bmp.getWidth() / 2,
                 middleY - bmp.getHeight() / 2, new Paint(Paint.FILTER_BITMAP_FLAG));
-        bmp.recycle();
+
+        // recycle the source bitmap automatically when:
+        // 1. the source bitmap is null, the bmp is derived from srdData and srcFile
+        // 2. the autoRecycle is true
+        if (srcBitmap == null || autoRecycle) {
+            bmp.recycle();
+        }
 
         if (srcFile != null) {
             int orientation = ImageUtils.getImageAngle(srcFile);

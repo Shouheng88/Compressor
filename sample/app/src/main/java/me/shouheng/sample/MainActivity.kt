@@ -236,6 +236,7 @@ class MainActivity : BaseActivity() {
             // connect compressor object
             LogUtils.d("Current configuration: \nConfig: $config\nScaleMode: $scaleMode")
 
+            var srcBitmap: Bitmap? = null
             val compress: Compress
             compress = when(compressorSourceType) {
                 SourceType.FILE -> {
@@ -246,8 +247,8 @@ class MainActivity : BaseActivity() {
                     Compress.with(this, byteArray)
                 }
                 SourceType.BITMAP -> {
-                    val bitmap = BitmapFactory.decodeFile(filePath)
-                    Compress.with(this, bitmap)
+                    srcBitmap = BitmapFactory.decodeFile(filePath)
+                    Compress.with(this, srcBitmap)
                 }
             }
 
@@ -344,6 +345,8 @@ class MainActivity : BaseActivity() {
                             val bitmap = bitmapBuilder.get()
                             ToastUtils.showShort("Success [Compressor,Bitmap,Get] $bitmap")
                             displayResult(bitmap)
+                            // this will cause a crash when it's automatically recycling the source bitmap
+                            binding.ivOriginal.setImageBitmap(srcBitmap)
                         }
                     }
                 }

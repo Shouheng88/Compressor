@@ -154,7 +154,11 @@ public abstract class SimpleStrategy extends AbstractStrategy {
             canvas.setMatrix(scaleMatrix);
             canvas.drawBitmap(srcBitmap, middleX - srcWidth / 2,
                     middleY - srcHeight / 2, new Paint(Paint.FILTER_BITMAP_FLAG));
-            srcBitmap.recycle();
+
+            // the user don't need the source bitmap
+            if (autoRecycle) {
+                srcBitmap.recycle();
+            }
             return scaledBitmap;
         } else if (srcData != null || srcFile != null) {
             // scale bitmap by bitmap decode options

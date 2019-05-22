@@ -1,5 +1,6 @@
 package me.shouheng.compress;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
@@ -22,6 +23,7 @@ public abstract class AbstractStrategy extends RequestBuilder<File> implements H
     protected File outFile;
     protected Bitmap.CompressFormat format = Config.DEFAULT_COMPRESS_FORMAT;
     protected int quality = Config.DEFAULT_COMPRESS_QUALITY;
+    protected boolean autoRecycle = Config.DEFAULT_BITMAP_RECYCLE;
 
     protected int srcWidth;
     protected int srcHeight;
@@ -84,5 +86,16 @@ public abstract class AbstractStrategy extends RequestBuilder<File> implements H
 
     /* package */ void setSrcData(byte[] srcData) {
         this.srcData = srcData;
+    }
+
+    /**
+     * Whether the source bitmap should be recycled. The source bitmap means the birmap you used in
+     * {@link Compress#with(Context, Bitmap)}. Since you may need to use the bitmap latter, so we
+     * added this method for you to custom this action,
+     *
+     * @param autoRecycle whether the source bitmap should be recycled automatically
+     */
+    /* package */ void setAutoRecycle(boolean autoRecycle) {
+        this.autoRecycle = autoRecycle;
     }
 }

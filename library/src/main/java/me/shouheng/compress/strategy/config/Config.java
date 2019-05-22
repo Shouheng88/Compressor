@@ -18,6 +18,11 @@ public final class Config {
 
     public static final String DEFAULT_CACHE_DIRECTORY_NAME = "compressor";
 
+    /**
+     * 是否自动回收源 Bitmap 的默认配置
+     */
+    public static final boolean DEFAULT_BITMAP_RECYCLE = true;
+
     public static final int LUBAN_DEFAULT_IGNORE_SIZE = 100; // KB
 
     public static final boolean LUBAN_COPY_WHEN_IGNORE = true;

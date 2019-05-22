@@ -164,7 +164,6 @@ val compressor = compress
 
 - 如果你期望返回的结果是 Bitmap，那么下面这些方法传入的参数将不会起作用：
 
-    - `setQuality(/*...*/)`：用来指定输出图片的质量，因为我们在调用 Bitmap.compress() 方法的时候才能用到该参数，因此它不会起作用
     - `setTargetDir(/*...*/)`：用来指定输出文件的位置
     - `setCompressListener(/*...*/)`：用来获取文件的压缩结果的回调
 
@@ -187,6 +186,11 @@ val compressor = compress
 3. 我们提供的示例 APK：[app-debug.apk](resources/app-debug.apk)
 
 ## 更新日志
+
+- 版本 1.3.1:
+
+	- 返回 Bitmap 类型数据的时候也进行图片的质量压缩
+	- 使用 Bitmap 作为数据源的时候，增加一个布尔类型的参数指定是否对 Bitmap 进行回收
 
 - 版本 1.3.0：
 

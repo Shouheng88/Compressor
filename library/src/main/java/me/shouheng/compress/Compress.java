@@ -13,15 +13,10 @@ import me.shouheng.compress.utils.FileUtils;
 import java.io.File;
 
 /**
- * The Compress connector. Sample:
- * <code>
- *     Compress.with(context, file)
- *             .setFormat(Bitmap.CompressFormat.JPEG)
- *             .setQuality(80)
- *             .strategy(Strategies.luban())
- *             .setCompressListener(compressListener)
- *             .launch()
- * </code>
+ * The Compress connector.
+ *
+ * @author WngShhng (shouheng2015@gmail.com)
+ * @version 2019-5-22
  */
 public final class Compress {
 
@@ -32,6 +27,7 @@ public final class Compress {
     private Bitmap.CompressFormat format = Config.DEFAULT_COMPRESS_FORMAT;
     private int quality = Config.DEFAULT_COMPRESS_QUALITY;
     private String targetDir;
+    private boolean autoRecycle = Config.DEFAULT_BITMAP_RECYCLE;
 
     private CacheNameFactory cacheNameFactory;
     private CompressListener compressListener;
@@ -75,6 +71,19 @@ public final class Compress {
      */
     public Compress setQuality(@IntRange(from = 0, to = 100) int quality) {
         this.quality = quality;
+        return this;
+    }
+
+    /**
+     * Whether the source bitmap should be recycled. The source bitmap means the birmap you used in
+     * {@link Compress#with(Context, Bitmap)}. Since you may need to use the bitmap latter, so we
+     * added this method for you to custom this action,
+     * Default values is {@link Config#DEFAULT_BITMAP_RECYCLE}.
+     *
+     * @param autoRecycle whether the source bitmap should be recycled automatically
+     */
+    public Compress setAutoRecycle(boolean autoRecycle) {
+        this.autoRecycle = autoRecycle;
         return this;
     }
 
@@ -127,6 +136,7 @@ public final class Compress {
         t.setSrcData(srcData);
         t.setFormat(format);
         t.setQuality(quality);
+        t.setAutoRecycle(autoRecycle);
         t.setOutFile(getOutFile());
         t.setCompressListener(compressListener);
         return t;
