@@ -52,7 +52,7 @@ repositories {
 然后，在项目的依赖中添加该库的依赖：
 
 ```gradle
-implementation 'me.shouheng.compressor:compressor:1.3.0'
+implementation 'me.shouheng.compressor:compressor:latest-version'
 ```
 
 ### 3.2 使用我们库进行压缩
@@ -208,9 +208,8 @@ val compressor = compress
 你可以通过访问下面的链接来获取作者的信息：
 
 1. Twitter: https://twitter.com/shouheng_wang
-2. 微博：https://weibo.com/5401152113/profile?rightmod=1&wvr=6&mod=personinfo
-3. Github: https://github.com/Shouheng88
-4. 掘金：https://juejin.im/user/585555e11b69e6006c907a2a
+2. Github: https://github.com/Shouheng88
+3. 掘金：https://juejin.im/user/585555e11b69e6006c907a2a
 
 ## License
 
