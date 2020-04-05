@@ -1,10 +1,35 @@
-# Mordern and advanced: an easy to use image compress library for Android
+<img src="https://github.com/CostCost/Resources/blob/master/github/banner.jpg?raw=true"/>
+<img src="https://github.com/CostCost/Resources/blob/master/github/offical.png?raw=true"/>
 
-[![Build Status](https://www.travis-ci.org/Shouheng88/Compressor.svg?branch=master)](https://www.travis-ci.org/Shouheng88/Compressor)
-![SLicense](https://img.shields.io/hexpm/l/plug.svg)
-![Version](https://img.shields.io/maven-metadata/v/https/dl.bintray.com/easymark/Android/me/shouheng/compressor/compressor/maven-metadata.xml.svg)
+<h1 align="center">Mordern and advanced: an easy to use image compress library for Android</h1>
 
-Other languages README docs: [中文版](./README-zh.md)
+<p align="center">
+  <a href="http://www.apache.org/licenses/LICENSE-2.0">
+    <img src="https://img.shields.io/hexpm/l/plug.svg" alt="License" />
+  </a>
+  <a href="https://bintray.com/beta/#/easymark/Android/compressor?tab=overview">
+    <img src="https://img.shields.io/maven-metadata/v/https/dl.bintray.com/easymark/Android/me/shouheng/compressor/compressor/maven-metadata.xml.svg" alt="Version" />
+  </a>
+  <a href="https://www.codacy.com/manual/Shouheng88/Compressor?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Shouheng88/Compressor&amp;utm_campaign=Badge_Grade">
+    <img src="https://api.codacy.com/project/badge/Grade/84a3602d08034493a4a62c73f7ad86f4" alt="Code Grade"/>
+  </a>
+  <a href="https://www.travis-ci.org/Shouheng88/Compressor">
+    <img src="https://www.travis-ci.org/Shouheng88/Compressor.svg?branch=master" alt="Build"/>
+  </a>
+    <a href="https://developer.android.com/about/versions/android-4.2.html">
+    <img src="https://img.shields.io/badge/API-17%2B-blue.svg?style=flat-square" alt="Min Sdk Version" />
+  </a>
+   <a href="https://github.com/Shouheng88">
+    <img src="https://img.shields.io/badge/Author-CodeBrick-orange.svg?style=flat-square" alt="Author" />
+  </a>
+  <a target="_blank" href="https://shang.qq.com/wpa/qunwpa?idkey=2711a5fa2e3ecfbaae34bd2cf2c98a5b25dd7d5cc56a3928abee84ae7a984253">
+    <img src="https://img.shields.io/badge/QQ%E7%BE%A4-1018235573-orange.svg?style=flat-square" alt="QQ Group" />
+  </a>
+</p>
+
+<p align="center">
+    <a href="./README-zh.md">中文版</a>
+</p>
 
 This project is mainly designed based on the Android image compress API. Also, it provided two image compress implementions based on open souce libraries  [Luban](https://github.com/Curzibn/Luban) and [Compressor](https://github.com/zetbaitsu/Compressor). In this library, it provided interfaces for multiple and different types of image source and result -- file, byte array, bitmap etc. It provided sync and async API to meet more circumstances. And it put forward the struture so that you can easily and conveniently switch from different strategys mentationed above.
 
@@ -169,45 +194,37 @@ So, the full code will be:
 
 Elegant, isn't it?
 
-## 3 More about project
+## 3 More
+
+### 3.1 About project
 
 We are glad if you could contribute to this project. Here, we provied more about our project to help you:
 
 1. Library structure: [https://www.processon.com/view/link/5cdfb769e4b00528648784b7](https://www.processon.com/view/link/5cdfb769e4b00528648784b7)
 2. Android compress APIs and this library introduction: [《开源一个 Android 图片压缩框架》](https://juejin.im/post/5c87d01f6fb9a049b7813784)
 3. Sample APK: [app-debug.apk](resources/app-debug.apk)
+4. [Release Log](CHANGELOG.md)
 
-## Release logs
-
-- Version 1.3.1:
-
-	- Do image quality compress when return Bitmap
-	- Solved the Bitmap recycle problem
-
-- Version 1.3.0:
-
-    - Added more image source types
-    - Added Bitmap result type
-    - Added async APIs
-    - Added color option
-    - Changed project structure
-
-- Version 1.0.0:
-
-  - Solved problem of rotation of Compressor image
-
-## Author
+### 3.2 About Author
 
 Visit the links below to get more information about author:
 
 1. Twitter: https://twitter.com/shouheng_wang
 2. Github: https://github.com/Shouheng88
 3. Juejin：https://juejin.im/user/585555e11b69e6006c907a2a
+4. JianShu: https://www.jianshu.com/u/e1ad842673e2
+
+## Donate
+
+<div style="display:flex;" id="target">
+<img src="https://github.com/CostCost/Resources/blob/master/github/ali.jpg?raw=true" width="25%" />
+<img src="https://github.com/CostCost/Resources/blob/master/github/mm.png?raw=true" style="margin-left:10px;" width="25%"/>
+</div>
 
 ## License
 
 ```
-Copyright (c) 2019 WngShhng.
+Copyright (c) 2019-2020 CodeBrick.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

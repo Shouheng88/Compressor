@@ -1,8 +1,34 @@
-# 一款现代、高效的 Android 图片压缩框架
+<img src="https://github.com/CostCost/Resources/blob/master/github/banner.jpg?raw=true"/>
+<img src="https://github.com/CostCost/Resources/blob/master/github/offical.png?raw=true"/>
 
-[![Build Status](https://www.travis-ci.org/Shouheng88/Compressor.svg?branch=master)](https://www.travis-ci.org/Shouheng88/Compressor)
-![SLicense](https://img.shields.io/hexpm/l/plug.svg)
-![Version](https://img.shields.io/maven-metadata/v/https/dl.bintray.com/easymark/Android/me/shouheng/compressor/compressor/maven-metadata.xml.svg)
+
+<h1 align="center">
+    一款现代、高效的 Android 图片压缩框架
+</h1>
+
+<p align="center">
+  <a href="http://www.apache.org/licenses/LICENSE-2.0">
+    <img src="https://img.shields.io/hexpm/l/plug.svg" alt="License" />
+  </a>
+  <a href="https://bintray.com/beta/#/easymark/Android/compressor?tab=overview">
+    <img src="https://img.shields.io/maven-metadata/v/https/dl.bintray.com/easymark/Android/me/shouheng/compressor/compressor/maven-metadata.xml.svg" alt="Version" />
+  </a>
+  <a href="https://www.codacy.com/manual/Shouheng88/Compressor?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Shouheng88/Compressor&amp;utm_campaign=Badge_Grade">
+    <img src="https://api.codacy.com/project/badge/Grade/84a3602d08034493a4a62c73f7ad86f4" alt="Code Grade"/>
+  </a>
+  <a href="https://www.travis-ci.org/Shouheng88/Compressor">
+    <img src="https://www.travis-ci.org/Shouheng88/Compressor.svg?branch=master" alt="Build"/>
+  </a>
+    <a href="https://developer.android.com/about/versions/android-4.2.html">
+    <img src="https://img.shields.io/badge/API-17%2B-blue.svg?style=flat-square" alt="Min Sdk Version" />
+  </a>
+   <a href="https://github.com/Shouheng88">
+    <img src="https://img.shields.io/badge/Author-CodeBrick-orange.svg?style=flat-square" alt="Author" />
+  </a>
+  <a target="_blank" href="https://shang.qq.com/wpa/qunwpa?idkey=2711a5fa2e3ecfbaae34bd2cf2c98a5b25dd7d5cc56a3928abee84ae7a984253">
+    <img src="https://img.shields.io/badge/QQ%E7%BE%A4-1018235573-orange.svg?style=flat-square" alt="QQ Group" />
+  </a>
+</p>
 
 本项目主要基于 Android 自带的图片压缩 API 进行实现，提供了开源压缩方案 [Luban](https://github.com/Curzibn/Luban) 和 [Compressor](https://github.com/zetbaitsu/Compressor) 的实现，解决了单一 Fie 类型数据源的问题，并在它们的基础之上进行了功能上的拓展。该项目的主要目的在于：提供一个统一图片压缩框库的实现，集成常用的两种图片压缩算法，让你以更低的成本集成图片压缩功能到自己的项目中。
 
@@ -184,24 +210,7 @@ val compressor = compress
 1. 项目整体的架构设计：[https://www.processon.com/view/link/5cdfb769e4b00528648784b7](https://www.processon.com/view/link/5cdfb769e4b00528648784b7)
 2. Android 图片压缩 API 的介绍，该项目的简介等：[《开源一个 Android 图片压缩框架》](https://juejin.im/post/5c87d01f6fb9a049b7813784)
 3. 我们提供的示例 APK：[app-debug.apk](resources/app-debug.apk)
-
-## 更新日志
-
-- 版本 1.3.1:
-
-	- 返回 Bitmap 类型数据的时候也进行图片的质量压缩
-	- 使用 Bitmap 作为数据源的时候，增加一个布尔类型的参数指定是否对 Bitmap 进行回收
-
-- 版本 1.3.0：
-
-    - 增加了多种数据源的支持
-    - 增加了 Bitmap 返回类型的支持
-    - 增加了同步压缩
-    - 增加了色彩的支持
-    - 部分代码重构，Compressor 压缩策略参数位置调整
-    - 项目结构调整
-
-- 版本 1.0.0：修改了 Compressor 压缩模式图片无法旋转的问题
+4. [更新日志](CHANGELOG.md)
 
 ## 关于作者
 
@@ -210,11 +219,19 @@ val compressor = compress
 1. Twitter: https://twitter.com/shouheng_wang
 2. Github: https://github.com/Shouheng88
 3. 掘金：https://juejin.im/user/585555e11b69e6006c907a2a
+4. 简书: https://www.jianshu.com/u/e1ad842673e2
+
+## Donate
+
+<div style="display:flex;" id="target">
+<img src="https://github.com/CostCost/Resources/blob/master/github/ali.jpg?raw=true" width="25%" />
+<img src="https://github.com/CostCost/Resources/blob/master/github/mm.png?raw=true" style="margin-left:10px;" width="25%"/>
+</div>
 
 ## License
 
 ```
-Copyright (c) 2019 WngShhng.
+Copyright (c) 2019-2020 CodeBrick.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
