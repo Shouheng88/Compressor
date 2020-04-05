@@ -1,6 +1,5 @@
-<img src="https://github.com/CostCost/Resources/blob/master/github/banner.jpg?raw=true"/>
-<img src="https://github.com/CostCost/Resources/blob/master/github/offical.png?raw=true"/>
-
+![Banner](https://github.com/CostCost/Resources/blob/master/github/banner.jpg?raw=true)
+![Offical](https://github.com/CostCost/Resources/blob/master/github/offical.png?raw=true)
 
 <h1 align="center">
     一款现代、高效的 Android 图片压缩框架

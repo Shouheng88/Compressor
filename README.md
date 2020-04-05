@@ -1,5 +1,5 @@
-<img src="https://github.com/CostCost/Resources/blob/master/github/banner.jpg?raw=true"/>
-<img src="https://github.com/CostCost/Resources/blob/master/github/offical.png?raw=true"/>
+![Banner](https://github.com/CostCost/Resources/blob/master/github/banner.jpg?raw=true)
+![Offical](https://github.com/CostCost/Resources/blob/master/github/offical.png?raw=true)
 
 <h1 align="center">Mordern and advanced: an easy to use image compress library for Android</h1>
 
