@@ -220,7 +220,9 @@ val compressor = compress
 3. 掘金：https://juejin.im/user/585555e11b69e6006c907a2a
 4. 简书: https://www.jianshu.com/u/e1ad842673e2
 
-## Donate
+## 捐赠项目
+
+我们致力于为广大开发者和个人开发者提供快速开发应用的解决方案。您可以通过下面的渠道来支持我们的项目，
 
 <div style="display:flex;" id="target">
 <img src="https://github.com/CostCost/Resources/blob/master/github/ali.jpg?raw=true" width="25%" />
