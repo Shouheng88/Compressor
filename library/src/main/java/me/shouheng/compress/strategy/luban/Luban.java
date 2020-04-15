@@ -4,8 +4,8 @@ import android.os.AsyncTask;
 import io.reactivex.Flowable;
 import me.shouheng.compress.strategy.config.Config;
 import me.shouheng.compress.strategy.SimpleStrategy;
-import me.shouheng.compress.utils.FileUtils;
-import me.shouheng.compress.utils.ImageUtils;
+import me.shouheng.compress.utils.CFileUtils;
+import me.shouheng.compress.utils.CImageUtils;
 import org.reactivestreams.Publisher;
 
 import java.io.File;
@@ -77,7 +77,7 @@ public class Luban extends SimpleStrategy {
 
     @Override
     public Flowable<File> asFlowable() {
-        if (srcFile == null || ImageUtils.needCompress(srcFile.getAbsolutePath(), ignoreSize)) {
+        if (srcFile == null || CImageUtils.needCompress(srcFile.getAbsolutePath(), ignoreSize)) {
             return super.asFlowable();
         } else {
             // don't need to compress.
@@ -86,7 +86,7 @@ public class Luban extends SimpleStrategy {
                     @Override
                     public Publisher<? extends File> call() {
                         notifyCompressStart();
-                        boolean succeed = FileUtils.copyFile(srcFile, outFile);
+                        boolean succeed = CFileUtils.copyFile(srcFile, outFile);
                         if (succeed) {
                             notifyCompressSuccess(outFile);
                             return Flowable.just(outFile);
@@ -112,7 +112,7 @@ public class Luban extends SimpleStrategy {
 
     @Override
     public void launch() {
-        if (srcFile == null || ImageUtils.needCompress(srcFile.getAbsolutePath(), ignoreSize)) {
+        if (srcFile == null || CImageUtils.needCompress(srcFile.getAbsolutePath(), ignoreSize)) {
             super.launch();
         } else {
             if (copyWhenIgnore) {
@@ -120,7 +120,7 @@ public class Luban extends SimpleStrategy {
                     @Override
                     public void run() {
                         notifyCompressStart();
-                        boolean succeed = FileUtils.copyFile(srcFile, outFile);
+                        boolean succeed = CFileUtils.copyFile(srcFile, outFile);
                         if (succeed) {
                             notifyCompressSuccess(outFile);
                         } else {

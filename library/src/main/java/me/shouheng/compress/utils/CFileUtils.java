@@ -6,11 +6,11 @@ import android.util.Log;
 
 import java.io.*;
 
-public final class FileUtils {
+public final class CFileUtils {
 
-    private static final String TAG = "FileUtils";
+    private static final String TAG = "CFileUtils";
 
-    private FileUtils() {
+    private CFileUtils() {
         throw new UnsupportedOperationException("u can't initialize me");
     }
 
@@ -40,7 +40,7 @@ public final class FileUtils {
             return result;
         }
         if (Log.isLoggable(TAG, Log.ERROR)) {
-            LogLog.e("default disk cache dir is null");
+            CLog.e("default disk cache dir is null");
         }
         return null;
     }
@@ -56,7 +56,7 @@ public final class FileUtils {
         try {
             return copyFile(new FileInputStream(source), new FileOutputStream(destination));
         } catch (FileNotFoundException e) {
-            LogLog.e("Error copying file : " + e);
+            CLog.e("Error copying file : " + e);
             return false;
         }
     }
@@ -80,7 +80,7 @@ public final class FileUtils {
             os.close();
             res = true;
         } catch (IOException e) {
-            LogLog.e("Error copying file : " + e);
+            CLog.e("Error copying file : " + e);
         }
         return res;
     }

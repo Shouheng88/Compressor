@@ -6,8 +6,8 @@ import io.reactivex.Flowable;
 import me.shouheng.compress.AbstractStrategy;
 import me.shouheng.compress.strategy.config.Config;
 import me.shouheng.compress.strategy.config.ScaleMode;
-import me.shouheng.compress.utils.ImageUtils;
-import me.shouheng.compress.utils.LogLog;
+import me.shouheng.compress.utils.CImageUtils;
+import me.shouheng.compress.utils.CLog;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -27,7 +27,7 @@ public class Compressor extends AbstractStrategy {
 
     private float maxHeight = Config.COMPRESSOR_DEFAULT_MAX_HEIGHT;
 
-    @ScaleMode.Mode
+    @ScaleMode
     private int scaleMode = Config.COMPRESSOR_DEFAULT_SCALE_MODE;
 
     private Bitmap.Config config;
@@ -58,16 +58,18 @@ public class Compressor extends AbstractStrategy {
 
     /**
      * Set the scale mode when the destination image ratio differ from the original original.
-     * Might be one of {@link ScaleMode#SCALE_LARGER},
-     * {@link ScaleMode#SCALE_SMALLER},
-     * {@link ScaleMode#SCALE_WIDTH} or
-     * {@link ScaleMode#SCALE_HEIGHT}.
+     *
+     * Might be one of :
+     * 1. {@link ScaleMode#SCALE_LARGER},
+     * 2. {@link ScaleMode#SCALE_SMALLER},
+     * 3. {@link ScaleMode#SCALE_WIDTH}
+     * 4. {@link ScaleMode#SCALE_HEIGHT}.
      *
      * @param scaleMode the scale mode.
      * @return the compressor object.
-     * @see ScaleMode
+     * @see ScaleMode for details ab out this field
      */
-    public Compressor setScaleMode(@ScaleMode.Mode int scaleMode) {
+    public Compressor setScaleMode(@ScaleMode int scaleMode) {
         this.scaleMode = scaleMode;
         return this;
     }
@@ -91,7 +93,7 @@ public class Compressor extends AbstractStrategy {
             compressAndWrite();
             notifyCompressSuccess(outFile);
         } catch (Exception e) {
-            LogLog.e(e.getMessage());
+            CLog.e(e.getMessage());
             notifyCompressError(e);
         }
         return outFile;
@@ -113,7 +115,7 @@ public class Compressor extends AbstractStrategy {
                     return Flowable.just(outFile);
                 } catch (Exception e) {
                     notifyCompressError(e);
-                    LogLog.e(e.getMessage());
+                    CLog.e(e.getMessage());
                     return Flowable.error(e);
                 }
             }
@@ -135,7 +137,7 @@ public class Compressor extends AbstractStrategy {
                     }
                 } catch (Exception e) {
                     notifyCompressError(e);
-                    LogLog.e(e.getMessage());
+                    CLog.e(e.getMessage());
                 }
             }
         });
@@ -251,7 +253,7 @@ public class Compressor extends AbstractStrategy {
      */
     private boolean compressAndWrite() throws IOException {
         Bitmap bitmap = compressByScale();
-        if (!ImageUtils.isEmptyBitmap(bitmap)) {
+        if (!CImageUtils.isEmptyBitmap(bitmap)) {
             FileOutputStream fos = new FileOutputStream(outFile);
             bitmap.compress(format, quality, fos);
             fos.flush();
@@ -269,7 +271,7 @@ public class Compressor extends AbstractStrategy {
      */
     private Bitmap compressByQuality() {
         Bitmap bitmap = compressByScale();
-        if (ImageUtils.isEmptyBitmap(bitmap)) return null;
+        if (CImageUtils.isEmptyBitmap(bitmap)) return null;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(format, quality, baos);
         byte[] bytes = baos.toByteArray();
@@ -345,9 +347,9 @@ public class Compressor extends AbstractStrategy {
         }
 
         if (srcFile != null) {
-            int orientation = ImageUtils.getImageAngle(srcFile);
+            int orientation = CImageUtils.getImageAngle(srcFile);
             if (orientation != 0) {
-                scaledBitmap = ImageUtils.rotateBitmap(scaledBitmap, ImageUtils.getImageAngle(srcFile));
+                scaledBitmap = CImageUtils.rotateBitmap(scaledBitmap, CImageUtils.getImageAngle(srcFile));
             }
         }
 

@@ -2,7 +2,6 @@ package me.shouheng.sample
 
 import android.app.Activity
 import android.content.Intent
-import android.databinding.DataBindingUtil
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
@@ -10,10 +9,8 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.support.annotation.RequiresApi
 import android.text.TextUtils
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
-import android.widget.Toast
 import com.bumptech.glide.Glide
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -22,20 +19,22 @@ import me.shouheng.compress.RequestBuilder
 import me.shouheng.compress.listener.CompressListener
 import me.shouheng.compress.strategy.Strategies
 import me.shouheng.compress.strategy.config.ScaleMode
+import me.shouheng.mvvm.base.CommonActivity
+import me.shouheng.mvvm.base.anno.ActivityConfiguration
+import me.shouheng.mvvm.comn.EmptyViewModel
 import me.shouheng.sample.databinding.ActivityMainBinding
-import me.shouheng.utils.app.ActivityHelper
 import me.shouheng.utils.app.IntentUtils
 import me.shouheng.utils.permission.Permission
 import me.shouheng.utils.permission.PermissionUtils
 import me.shouheng.utils.permission.callback.OnGetPermissionCallback
-import me.shouheng.utils.stability.LogUtils
+import me.shouheng.utils.stability.L
 import me.shouheng.utils.store.FileUtils
 import me.shouheng.utils.store.IOUtils
 import me.shouheng.utils.store.PathUtils
-import me.shouheng.utils.ui.ToastUtils
 import java.io.File
 
-class MainActivity : BaseActivity() {
+@ActivityConfiguration(layoutResId = R.layout.activity_main)
+class MainActivity : CommonActivity<ActivityMainBinding, EmptyViewModel>() {
 
     companion object {
         const val REQUEST_IMAGE_CAPTURE     = 0x0100
@@ -73,12 +72,7 @@ class MainActivity : BaseActivity() {
     private var resultTypeArray = arrayOf(ResultType.FILE, ResultType.BITMAP)
     private var launchTypeArray = arrayOf(LaunchType.LAUNCH, LaunchType.AS_FLOWABLE, LaunchType.GET)
 
-    private lateinit var binding: ActivityMainBinding
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.activity_main, null, false)
-        setContentView(binding.root)
+    override fun doCreateView(savedInstanceState: Bundle?) {
         configViews()
     }
 
@@ -101,7 +95,7 @@ class MainActivity : BaseActivity() {
                     val uri = Utils.getUriFromFile(this@MainActivity, file)
                     startActivityForResult(IntentUtils.getCaptureIntent(uri), REQUEST_IMAGE_CAPTURE)
                 } else{
-                    ToastUtils.showShort("Can't create file!", Toast.LENGTH_SHORT)
+                    toast("Can't create file!")
                 }
             }, Permission.CAMERA, Permission.STORAGE)
         }
@@ -113,7 +107,7 @@ class MainActivity : BaseActivity() {
             }
         }
         binding.btnSample.setOnClickListener {
-            ActivityHelper.start(this@MainActivity, SampleActivity::class.java)
+            startActivity(SampleActivity::class.java)
         }
 
         /* configuration for luban */
@@ -234,7 +228,7 @@ class MainActivity : BaseActivity() {
             val filePath = tag as String
             val file = File(filePath)
             // connect compressor object
-            LogUtils.d("Current configuration: \nConfig: $config\nScaleMode: $scaleMode")
+            L.d("Current configuration: \nConfig: $config\nScaleMode: $scaleMode")
 
             var srcBitmap: Bitmap? = null
             val compress: Compress
@@ -258,19 +252,19 @@ class MainActivity : BaseActivity() {
                 .setTargetDir(PathUtils.getExternalPicturesPath())
                 .setCompressListener(object : CompressListener {
                     override fun onStart() {
-                        LogUtils.d(Thread.currentThread().toString())
-                        ToastUtils.showShort("Start [Compressor,File]")
+                        L.d(Thread.currentThread().toString())
+                        toast("Start [Compressor,File]")
                     }
 
                     override fun onSuccess(result: File?) {
-                        LogUtils.d(Thread.currentThread().toString())
+                        L.d(Thread.currentThread().toString())
                         displayResult(result?.absolutePath)
-                        ToastUtils.showShort("Success [Compressor,File] : $result")
+                        toast("Success [Compressor,File] : $result")
                     }
 
                     override fun onError(throwable: Throwable?) {
-                        LogUtils.d(Thread.currentThread().toString())
-                        ToastUtils.showShort("Error [Compressor,File] : $throwable")
+                        L.d(Thread.currentThread().toString())
+                        toast("Error [Compressor,File] : $throwable")
                     }
                 })
                 .strategy(Strategies.compressor())
@@ -292,15 +286,15 @@ class MainActivity : BaseActivity() {
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({
-                                    ToastUtils.showShort("Success [Compressor,File,Flowable] $it")
+                                    toast("Success [Compressor,File,Flowable] $it")
                                     displayResult(it.absolutePath)
                                 }, {
-                                    ToastUtils.showShort("Error [Compressor,File,Flowable] : $it")
+                                    toast("Error [Compressor,File,Flowable] : $it")
                                 })
                         }
                         LaunchType.GET -> {
                             val resultFile = compressor.get()
-                            ToastUtils.showShort("Success [Compressor,File,Get] $resultFile")
+                            toast("Success [Compressor,File,Get] $resultFile")
                             displayResult(resultFile.absolutePath)
                         }
                     }
@@ -312,19 +306,19 @@ class MainActivity : BaseActivity() {
                             bitmapBuilder
                                 .setCompressListener(object : RequestBuilder.Callback<Bitmap> {
                                     override fun onStart() {
-                                        LogUtils.d(Thread.currentThread().toString())
-                                        ToastUtils.showShort("Start [Compressor,Bitmap,Launch]")
+                                        L.d(Thread.currentThread().toString())
+                                        toast("Start [Compressor,Bitmap,Launch]")
                                     }
 
                                     override fun onSuccess(result: Bitmap?) {
-                                        LogUtils.d(Thread.currentThread().toString())
+                                        L.d(Thread.currentThread().toString())
                                         displayResult(result)
-                                        ToastUtils.showShort("Success [Compressor,Bitmap,Launch] : $result")
+                                        toast("Success [Compressor,Bitmap,Launch] : $result")
                                     }
 
                                     override fun onError(throwable: Throwable?) {
-                                        LogUtils.d(Thread.currentThread().toString())
-                                        ToastUtils.showShort("Error [Compressor,Bitmap,Launch] : $throwable")
+                                        L.d(Thread.currentThread().toString())
+                                        toast("Error [Compressor,Bitmap,Launch] : $throwable")
                                     }
                                 })
                                 .launch()
@@ -335,15 +329,15 @@ class MainActivity : BaseActivity() {
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({
-                                    ToastUtils.showShort("Success [Compressor,Bitmap,Flowable] $it")
+                                    toast("Success [Compressor,Bitmap,Flowable] $it")
                                     displayResult(it)
                                 }, {
-                                    ToastUtils.showShort("Error [Compressor,Bitmap,Flowable] : $it")
+                                    toast("Error [Compressor,Bitmap,Flowable] : $it")
                                 })
                         }
                         LaunchType.GET -> {
                             val bitmap = bitmapBuilder.get()
-                            ToastUtils.showShort("Success [Compressor,Bitmap,Get] $bitmap")
+                            toast("Success [Compressor,Bitmap,Get] $bitmap")
                             displayResult(bitmap)
                             // this will cause a crash when it's automatically recycling the source bitmap
                             binding.ivOriginal.setImageBitmap(srcBitmap)
@@ -380,19 +374,19 @@ class MainActivity : BaseActivity() {
             val luban = compress
                 .setCompressListener(object : CompressListener{
                     override fun onStart() {
-                        LogUtils.d(Thread.currentThread().toString())
-                        ToastUtils.showShort("Start [Luban,File]")
+                        L.d(Thread.currentThread().toString())
+                        toast("Start [Luban,File]")
                     }
 
                     override fun onSuccess(result: File?) {
-                        LogUtils.d(Thread.currentThread().toString())
+                        L.d(Thread.currentThread().toString())
                         displayResult(result?.absolutePath)
-                        ToastUtils.showShort("Success [Luban,File] : $result")
+                        toast("Success [Luban,File] : $result")
                     }
 
                     override fun onError(throwable: Throwable?) {
-                        LogUtils.d(Thread.currentThread().toString())
-                        ToastUtils.showShort("Error [Luban,File] : $throwable")
+                        L.d(Thread.currentThread().toString())
+                        toast("Error [Luban,File] : $throwable")
                     }
                 })
                 .setCacheNameFactory { System.currentTimeMillis().toString() + ".jpg" }
@@ -412,15 +406,15 @@ class MainActivity : BaseActivity() {
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({
-                                    ToastUtils.showShort("Start [Luban,File,Flowable]")
+                                    toast("Start [Luban,File,Flowable]")
                                     displayResult(it.absolutePath)
                                 }, {
-                                    ToastUtils.showShort("Error [Luban,File,Flowable] : $it")
+                                    toast("Error [Luban,File,Flowable] : $it")
                                 })
                         }
                         LaunchType.GET -> {
                             val resultFile = luban.get()
-                            ToastUtils.showShort("Success [Luban,File,Get] $resultFile")
+                            toast("Success [Luban,File,Get] $resultFile")
                             displayResult(resultFile.absolutePath)
                         }
                     }
@@ -433,19 +427,19 @@ class MainActivity : BaseActivity() {
                             bitmapBuilder
                                 .setCompressListener(object : RequestBuilder.Callback<Bitmap> {
                                     override fun onStart() {
-                                        LogUtils.d(Thread.currentThread().toString())
-                                        ToastUtils.showShort("Start [Luban,Bitmap,Launch]")
+                                        L.d(Thread.currentThread().toString())
+                                        toast("Start [Luban,Bitmap,Launch]")
                                     }
 
                                     override fun onSuccess(result: Bitmap?) {
-                                        LogUtils.d(Thread.currentThread().toString())
+                                        L.d(Thread.currentThread().toString())
                                         displayResult(result)
-                                        ToastUtils.showShort("Success [Luban,Bitmap,Launch] : $result")
+                                        toast("Success [Luban,Bitmap,Launch] : $result")
                                     }
 
                                     override fun onError(throwable: Throwable?) {
-                                        LogUtils.d(Thread.currentThread().toString())
-                                        ToastUtils.showShort("Error [Luban,Bitmap,Launch] : $throwable")
+                                        L.d(Thread.currentThread().toString())
+                                        toast("Error [Luban,Bitmap,Launch] : $throwable")
                                     }
                                 })
                                 .launch()
@@ -455,15 +449,15 @@ class MainActivity : BaseActivity() {
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({
-                                    ToastUtils.showShort("Success [Luban,Bitmap,Flowable] : $it")
+                                    toast("Success [Luban,Bitmap,Flowable] : $it")
                                     displayResult(it)
                                 }, {
-                                    ToastUtils.showShort("Error [Luban,Bitmap,Flowable] : $it", Toast.LENGTH_SHORT)
+                                    toast("Error [Luban,Bitmap,Flowable] : $it")
                                 })
                         }
                         LaunchType.GET -> {
                             val bitmap = bitmapBuilder.get()
-                            ToastUtils.showShort("Success [Luban,Bitmap,Get] $bitmap")
+                            toast("Success [Luban,Bitmap,Get] $bitmap")
                             displayResult(bitmap)
                         }
                     }
@@ -481,19 +475,19 @@ class MainActivity : BaseActivity() {
             Compress.with(this@MainActivity, file)
                 .setCompressListener(object : CompressListener{
                     override fun onStart() {
-                        LogUtils.d(Thread.currentThread().toString())
-                        ToastUtils.showShort("Compress Start")
+                        L.d(Thread.currentThread().toString())
+                        toast("Compress Start")
                     }
 
                     override fun onSuccess(result: File?) {
-                        LogUtils.d(Thread.currentThread().toString())
+                        L.d(Thread.currentThread().toString())
                         displayResult(result?.absolutePath)
-                        ToastUtils.showShort("Compress Success : $result")
+                        toast("Compress Success : $result")
                     }
 
                     override fun onError(throwable: Throwable?) {
-                        LogUtils.d(Thread.currentThread().toString())
-                        ToastUtils.showShort("Compress Error ：$throwable")
+                        L.d(Thread.currentThread().toString())
+                        toast("Compress Error ：$throwable")
                     }
                 })
                 .setQuality(80)
@@ -504,7 +498,7 @@ class MainActivity : BaseActivity() {
 
     private fun displayOriginal(filePath: String?) {
         if (TextUtils.isEmpty(filePath)) {
-            ToastUtils.showShort("Error when displaying image info!")
+            toast("Error when displaying image info!")
             return
         }
         val options = BitmapFactory.Options()
@@ -522,7 +516,7 @@ class MainActivity : BaseActivity() {
 
     private fun displayResult(filePath: String?) {
         if (TextUtils.isEmpty(filePath)) {
-            ToastUtils.showShort("Error when displaying image info!")
+            toast("Error when displaying image info!")
             return
         }
         val options = BitmapFactory.Options()

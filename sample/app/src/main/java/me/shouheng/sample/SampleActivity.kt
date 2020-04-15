@@ -1,17 +1,18 @@
 package me.shouheng.sample
 
-import android.databinding.DataBindingUtil
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
-import android.view.LayoutInflater
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import me.shouheng.compress.Compress
 import me.shouheng.compress.strategy.Strategies
 import me.shouheng.compress.strategy.config.ScaleMode
+import me.shouheng.mvvm.base.CommonActivity
+import me.shouheng.mvvm.base.anno.ActivityConfiguration
+import me.shouheng.mvvm.comn.EmptyViewModel
 import me.shouheng.sample.databinding.ActivitySampleBinding
 import me.shouheng.utils.ui.ImageUtils
 import me.shouheng.utils.ui.ToastUtils
@@ -19,18 +20,15 @@ import me.shouheng.utils.ui.ViewUtils
 import java.io.ByteArrayOutputStream
 
 /**
+ * Sample strategy activity
+ *
  * @author WngShhng (shouheng2015@gmail.com)
  * @version 2019/5/17 22:04
  */
-class SampleActivity : BaseActivity() {
+@ActivityConfiguration(layoutResId = R.layout.activity_sample)
+class SampleActivity : CommonActivity<ActivitySampleBinding, EmptyViewModel>() {
 
-    private lateinit var binding: ActivitySampleBinding
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.activity_sample, null, false)
-        setContentView(binding.root)
-
+    override fun doCreateView(savedInstanceState: Bundle?) {
         val d = Observable.create<Bitmap> {
             val bitmap = Compress.with(this, BitmapFactory.decodeResource(resources, R.drawable.img_lena))
                 .strategy(Strategies.compressor())
@@ -44,9 +42,8 @@ class SampleActivity : BaseActivity() {
         }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
             binding.iv2.setImageBitmap(it)
         }, {
-            ToastUtils.showShort("error : $it")
+            toast("error : $it")
         })
-
         val d2 = Observable.create<Bitmap> {
             var bitmap = BitmapFactory.decodeResource(resources, R.drawable.img_lena)
             val out = ByteArrayOutputStream()
@@ -65,7 +62,7 @@ class SampleActivity : BaseActivity() {
         }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
             binding.iv3.setImageBitmap(it)
         }, {
-            ToastUtils.showShort("error : $it")
+            toast("error : $it")
         })
     }
 }

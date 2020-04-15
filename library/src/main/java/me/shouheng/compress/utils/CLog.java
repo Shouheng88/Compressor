@@ -7,13 +7,13 @@ import android.util.Log;
  *
  * @author WngShhng (shouheng2015@gmail.com)
  */
-public class LogLog {
+public final class CLog {
 
     private static String TAG = "EasyCompressor";
 
     private static boolean debug;
 
-    private LogLog() {
+    private CLog() {
         throw new UnsupportedOperationException("u can't initialize me");
     }
 
@@ -32,7 +32,7 @@ public class LogLog {
      * @param debug debug mode
      */
     public static void setDebug(boolean debug) {
-        LogLog.debug = debug;
+        CLog.debug = debug;
     }
 
     /**
@@ -50,7 +50,7 @@ public class LogLog {
      * @param TAG the tag
      */
     public static void setTAG(String TAG) {
-        LogLog.TAG = TAG;
+        CLog.TAG = TAG;
     }
 
     public static void d(String message) {

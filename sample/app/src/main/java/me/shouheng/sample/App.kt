@@ -1,17 +1,23 @@
 package me.shouheng.sample
 
 import android.app.Application
-import me.shouheng.compress.utils.LogLog
-import me.shouheng.utils.UtilsApp
+import android.content.Context
+import me.shouheng.compress.utils.CLog
+import me.shouheng.mvvm.MVVMs
 
 /**
  * The custom application
  */
 class App : Application() {
 
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+        MVVMs.attachBaseContext(base)
+    }
+
     override fun onCreate() {
         super.onCreate()
-        UtilsApp.init(this)
-        LogLog.setDebug(true)
+        CLog.setDebug(true)
+        MVVMs.onCreate(this)
     }
 }

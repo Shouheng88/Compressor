@@ -11,6 +11,7 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -42,5 +43,9 @@ dependencies {
 
     kapt 'com.android.databinding:compiler:3.1.3'
 
-    implementation 'me.shouheng.utils:utils-core:1.1.0'
+    implementation ('me.shouheng.mvvm:mvvm-core:1.2.11') {
+        exclude group: 'me.shouheng.utils'
+    }
+    implementation 'me.shouheng.ui:uix-core:1.1.5'
+    implementation 'me.shouheng.utils:utils-core:1.3.6'
 }

@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import io.reactivex.Flowable;
 import me.shouheng.compress.RequestBuilder;
-import me.shouheng.compress.utils.LogLog;
+import me.shouheng.compress.utils.CLog;
 
 import java.util.concurrent.Callable;
 
@@ -22,7 +22,7 @@ public class BitmapBuilder extends RequestBuilder<Bitmap> {
                 notifyCompressError(new Exception("Failed to compress image, either caused by OOM or other problems."));
             }
         } catch (Exception e) {
-            LogLog.e(e.getMessage());
+            CLog.e(e.getMessage());
             notifyCompressError(e);
         }
         return bitmap;
@@ -46,7 +46,7 @@ public class BitmapBuilder extends RequestBuilder<Bitmap> {
                     }
                 } catch (Exception e) {
                     notifyCompressError(e);
-                    LogLog.e(e.getMessage());
+                    CLog.e(e.getMessage());
                     return Flowable.error(e);
                 }
             }
@@ -68,7 +68,7 @@ public class BitmapBuilder extends RequestBuilder<Bitmap> {
                     }
                 } catch (Exception e) {
                     notifyCompressError(e);
-                    LogLog.e(e.getMessage());
+                    CLog.e(e.getMessage());
                 }
             }
         });

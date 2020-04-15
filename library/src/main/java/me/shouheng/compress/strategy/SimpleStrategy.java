@@ -4,8 +4,8 @@ import android.graphics.*;
 import android.os.AsyncTask;
 import io.reactivex.Flowable;
 import me.shouheng.compress.AbstractStrategy;
-import me.shouheng.compress.utils.ImageUtils;
-import me.shouheng.compress.utils.LogLog;
+import me.shouheng.compress.utils.CImageUtils;
+import me.shouheng.compress.utils.CLog;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -28,7 +28,7 @@ public abstract class SimpleStrategy extends AbstractStrategy {
             compressAndWrite();
             notifyCompressSuccess(outFile);
         } catch (Exception e) {
-            LogLog.e(e.getMessage());
+            CLog.e(e.getMessage());
             notifyCompressError(e);
         }
         return outFile;
@@ -101,7 +101,7 @@ public abstract class SimpleStrategy extends AbstractStrategy {
      */
     private boolean compressAndWrite() throws IOException {
         Bitmap bitmap = compressByScale();
-        if (!ImageUtils.isEmptyBitmap(bitmap)) {
+        if (!CImageUtils.isEmptyBitmap(bitmap)) {
             FileOutputStream fos = new FileOutputStream(outFile);
             bitmap.compress(format, quality, fos);
             fos.flush();
@@ -119,7 +119,7 @@ public abstract class SimpleStrategy extends AbstractStrategy {
      */
     private Bitmap compressByQuality() {
         Bitmap bitmap = compressByScale();
-        if (ImageUtils.isEmptyBitmap(bitmap)) return null;
+        if (CImageUtils.isEmptyBitmap(bitmap)) return null;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(format, quality, baos);
         byte[] bytes = baos.toByteArray();
@@ -170,9 +170,9 @@ public abstract class SimpleStrategy extends AbstractStrategy {
         }
 
         if (srcFile != null) {
-            int orientation = ImageUtils.getImageAngle(srcFile);
+            int orientation = CImageUtils.getImageAngle(srcFile);
             if (orientation != 0) {
-                bitmap = ImageUtils.rotateBitmap(bitmap, orientation);
+                bitmap = CImageUtils.rotateBitmap(bitmap, orientation);
             }
         }
         return bitmap;

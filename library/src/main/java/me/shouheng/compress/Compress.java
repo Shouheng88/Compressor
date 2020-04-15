@@ -8,7 +8,7 @@ import me.shouheng.compress.listener.CompressListener;
 import me.shouheng.compress.naming.CacheNameFactory;
 import me.shouheng.compress.naming.DefaultNameFactory;
 import me.shouheng.compress.strategy.config.Config;
-import me.shouheng.compress.utils.FileUtils;
+import me.shouheng.compress.utils.CFileUtils;
 
 import java.io.File;
 
@@ -149,7 +149,7 @@ public final class Compress {
      */
     private File getOutFile() {
         if (TextUtils.isEmpty(targetDir)) {
-            File cacheDir = FileUtils.getDefaultCacheDir(context, Config.DEFAULT_CACHE_DIRECTORY_NAME);
+            File cacheDir = CFileUtils.getDefaultCacheDir(context, Config.DEFAULT_CACHE_DIRECTORY_NAME);
             if (cacheDir == null) {
                 throw new IllegalStateException("Cache directory is null, check your storage permission and try again.");
             } else {

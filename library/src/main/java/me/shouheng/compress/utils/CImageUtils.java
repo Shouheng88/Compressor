@@ -7,9 +7,9 @@ import android.media.ExifInterface;
 import java.io.File;
 import java.io.IOException;
 
-public final class ImageUtils {
+public final class CImageUtils {
 
-    private ImageUtils() {
+    private CImageUtils() {
         throw new UnsupportedOperationException("u can't initialize me");
     }
 

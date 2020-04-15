@@ -12,26 +12,26 @@ import static me.shouheng.compress.strategy.config.ScaleMode.SCALE_LARGER;
  */
 public final class Config {
 
-    public static final Bitmap.CompressFormat DEFAULT_COMPRESS_FORMAT = Bitmap.CompressFormat.JPEG;
+    public static final Bitmap.CompressFormat DEFAULT_COMPRESS_FORMAT   = Bitmap.CompressFormat.JPEG;
 
-    public static final int DEFAULT_COMPRESS_QUALITY = 75; // [0, 100]
+    public static final int DEFAULT_COMPRESS_QUALITY                    = 75; // [0, 100]
 
-    public static final String DEFAULT_CACHE_DIRECTORY_NAME = "compressor";
+    public static final String DEFAULT_CACHE_DIRECTORY_NAME             = "compressor";
 
     /**
      * whether should the bitmap recycled automatically
      */
-    public static final boolean DEFAULT_BITMAP_RECYCLE = true;
+    public static final boolean DEFAULT_BITMAP_RECYCLE                  = true;
 
-    public static final int LUBAN_DEFAULT_IGNORE_SIZE = 100; // KB
+    public static final int LUBAN_DEFAULT_IGNORE_SIZE                   = 100; // KB
 
-    public static final boolean LUBAN_COPY_WHEN_IGNORE = true;
+    public static final boolean LUBAN_COPY_WHEN_IGNORE                  = true;
 
-    public static final float COMPRESSOR_DEFAULT_MAX_WIDTH = 612.0f;
+    public static final float COMPRESSOR_DEFAULT_MAX_WIDTH              = 612.0f;
 
-    public static final float COMPRESSOR_DEFAULT_MAX_HEIGHT = 816.0f;
+    public static final float COMPRESSOR_DEFAULT_MAX_HEIGHT             = 816.0f;
 
-    @ScaleMode.Mode
+    @ScaleMode
     public static final int COMPRESSOR_DEFAULT_SCALE_MODE = SCALE_LARGER;
 
     private Config() {
