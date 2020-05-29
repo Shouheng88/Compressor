@@ -48,6 +48,7 @@
         <item>launch</item>
         <item>asFlowable</item>
         <item>get</item>
+        <item>Coroutine</item>
     </array>
 
     <array name="source_type">
