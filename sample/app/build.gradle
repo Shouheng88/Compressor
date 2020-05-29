@@ -26,6 +26,9 @@ android {
     packagingOptions {
         exclude 'META-INF/proguard/coroutines.pro'
     }
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
