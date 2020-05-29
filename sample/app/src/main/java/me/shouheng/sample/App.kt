@@ -17,7 +17,7 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        CLog.setDebug(true)
+        CLog.isDebug = true
         MVVMs.onCreate(this)
     }
 }

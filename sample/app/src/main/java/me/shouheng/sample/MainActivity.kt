@@ -14,9 +14,14 @@ import android.widget.AdapterView
 import com.bumptech.glide.Glide
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.shouheng.compress.Compress
 import me.shouheng.compress.RequestBuilder
 import me.shouheng.compress.listener.CompressListener
+import me.shouheng.compress.naming.CacheNameFactory
 import me.shouheng.compress.strategy.Strategies
 import me.shouheng.compress.strategy.config.ScaleMode
 import me.shouheng.mvvm.base.CommonActivity
@@ -70,7 +75,7 @@ class MainActivity : CommonActivity<ActivityMainBinding, EmptyViewModel>() {
         ScaleMode.SCALE_HEIGHT)
     private var sourceTypeArray = arrayOf(SourceType.FILE, SourceType.BYTE_ARRAY, SourceType.BITMAP)
     private var resultTypeArray = arrayOf(ResultType.FILE, ResultType.BITMAP)
-    private var launchTypeArray = arrayOf(LaunchType.LAUNCH, LaunchType.AS_FLOWABLE, LaunchType.GET)
+    private var launchTypeArray = arrayOf(LaunchType.LAUNCH, LaunchType.AS_FLOWABLE, LaunchType.GET, LaunchType.COROUTINES)
 
     override fun doCreateView(savedInstanceState: Bundle?) {
         configViews()
@@ -256,13 +261,13 @@ class MainActivity : CommonActivity<ActivityMainBinding, EmptyViewModel>() {
                         toast("Start [Compressor,File]")
                     }
 
-                    override fun onSuccess(result: File?) {
+                    override fun onSuccess(result: File) {
                         L.d(Thread.currentThread().toString())
-                        displayResult(result?.absolutePath)
+                        displayResult(result.absolutePath)
                         toast("Success [Compressor,File] : $result")
                     }
 
-                    override fun onError(throwable: Throwable?) {
+                    override fun onError(throwable: Throwable) {
                         L.d(Thread.currentThread().toString())
                         toast("Error [Compressor,File] : $throwable")
                     }
@@ -297,6 +302,15 @@ class MainActivity : CommonActivity<ActivityMainBinding, EmptyViewModel>() {
                             toast("Success [Compressor,File,Get] $resultFile")
                             displayResult(resultFile.absolutePath)
                         }
+                        LaunchType.COROUTINES -> {
+                            GlobalScope.launch {
+                                val resultFile = compressor.get(Dispatchers.IO)
+                                toast("Success [Luban,File,Kt,Get] $resultFile")
+                                withContext(Dispatchers.Main) {
+                                    displayResult(resultFile.absolutePath)
+                                }
+                            }
+                        }
                     }
                 }
                 ResultType.BITMAP -> {
@@ -310,13 +324,13 @@ class MainActivity : CommonActivity<ActivityMainBinding, EmptyViewModel>() {
                                         toast("Start [Compressor,Bitmap,Launch]")
                                     }
 
-                                    override fun onSuccess(result: Bitmap?) {
+                                    override fun onSuccess(result: Bitmap) {
                                         L.d(Thread.currentThread().toString())
                                         displayResult(result)
                                         toast("Success [Compressor,Bitmap,Launch] : $result")
                                     }
 
-                                    override fun onError(throwable: Throwable?) {
+                                    override fun onError(throwable: Throwable) {
                                         L.d(Thread.currentThread().toString())
                                         toast("Error [Compressor,Bitmap,Launch] : $throwable")
                                     }
@@ -341,6 +355,15 @@ class MainActivity : CommonActivity<ActivityMainBinding, EmptyViewModel>() {
                             displayResult(bitmap)
                             // this will cause a crash when it's automatically recycling the source bitmap
                             binding.ivOriginal.setImageBitmap(srcBitmap)
+                        }
+                        LaunchType.COROUTINES -> {
+                            GlobalScope.launch {
+                                val bitmap = bitmapBuilder.get(Dispatchers.IO)
+                                toast("Success [Luban,Bitmap,Kt,Get] $bitmap")
+                                withContext(Dispatchers.Main) {
+                                    displayResult(bitmap)
+                                }
+                            }
                         }
                     }
                 }
@@ -378,18 +401,22 @@ class MainActivity : CommonActivity<ActivityMainBinding, EmptyViewModel>() {
                         toast("Start [Luban,File]")
                     }
 
-                    override fun onSuccess(result: File?) {
+                    override fun onSuccess(result: File) {
                         L.d(Thread.currentThread().toString())
                         displayResult(result?.absolutePath)
                         toast("Success [Luban,File] : $result")
                     }
 
-                    override fun onError(throwable: Throwable?) {
+                    override fun onError(throwable: Throwable) {
                         L.d(Thread.currentThread().toString())
                         toast("Error [Luban,File] : $throwable")
                     }
                 })
-                .setCacheNameFactory { System.currentTimeMillis().toString() + ".jpg" }
+                .setCacheNameFactory(object : CacheNameFactory {
+                    override fun getFileName(format: Bitmap.CompressFormat): String {
+                        return System.currentTimeMillis().toString() + ".jpg"
+                    }
+                })
                 .setQuality(80)
                 .strategy(Strategies.luban())
                 .setIgnoreSize(100, copy)
@@ -417,6 +444,15 @@ class MainActivity : CommonActivity<ActivityMainBinding, EmptyViewModel>() {
                             toast("Success [Luban,File,Get] $resultFile")
                             displayResult(resultFile.absolutePath)
                         }
+                        LaunchType.COROUTINES -> {
+                            GlobalScope.launch {
+                                val resultFile = luban.get(Dispatchers.IO)
+                                toast("Success [Luban,File,Kt,Get] $resultFile")
+                                withContext(Dispatchers.Main) {
+                                    displayResult(resultFile.absolutePath)
+                                }
+                            }
+                        }
                     }
                 }
                 ResultType.BITMAP -> {
@@ -431,13 +467,13 @@ class MainActivity : CommonActivity<ActivityMainBinding, EmptyViewModel>() {
                                         toast("Start [Luban,Bitmap,Launch]")
                                     }
 
-                                    override fun onSuccess(result: Bitmap?) {
+                                    override fun onSuccess(result: Bitmap) {
                                         L.d(Thread.currentThread().toString())
                                         displayResult(result)
                                         toast("Success [Luban,Bitmap,Launch] : $result")
                                     }
 
-                                    override fun onError(throwable: Throwable?) {
+                                    override fun onError(throwable: Throwable) {
                                         L.d(Thread.currentThread().toString())
                                         toast("Error [Luban,Bitmap,Launch] : $throwable")
                                     }
@@ -460,6 +496,15 @@ class MainActivity : CommonActivity<ActivityMainBinding, EmptyViewModel>() {
                             toast("Success [Luban,Bitmap,Get] $bitmap")
                             displayResult(bitmap)
                         }
+                        LaunchType.COROUTINES -> {
+                            GlobalScope.launch {
+                                val bitmap = bitmapBuilder.get(Dispatchers.IO)
+                                toast("Success [Luban,Bitmap,Kt,Get] $bitmap")
+                                withContext(Dispatchers.Main) {
+                                    displayResult(bitmap)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -479,13 +524,13 @@ class MainActivity : CommonActivity<ActivityMainBinding, EmptyViewModel>() {
                         toast("Compress Start")
                     }
 
-                    override fun onSuccess(result: File?) {
+                    override fun onSuccess(result: File) {
                         L.d(Thread.currentThread().toString())
                         displayResult(result?.absolutePath)
                         toast("Compress Success : $result")
                     }
 
-                    override fun onError(throwable: Throwable?) {
+                    override fun onError(throwable: Throwable) {
                         L.d(Thread.currentThread().toString())
                         toast("Compress Error ：$throwable")
                     }
@@ -543,7 +588,8 @@ class MainActivity : CommonActivity<ActivityMainBinding, EmptyViewModel>() {
     enum class LaunchType {
         LAUNCH,
         AS_FLOWABLE,
-        GET
+        GET,
+        COROUTINES
     }
 
     /**
