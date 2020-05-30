@@ -1,7 +1,7 @@
 ![Banner](https://github.com/CostCost/Resources/blob/master/github/banner.jpg?raw=true)
 ![Offical](https://github.com/CostCost/Resources/blob/master/github/offical.png?raw=true)
 
-<h1 align="center">Mordern and advanced: an easy to use image compress library for Android</h1>
+<h1 align="center">An easy to use image compress library for Android</h1>
 
 <p align="center">
   <a href="http://www.apache.org/licenses/LICENSE-2.0">
@@ -35,7 +35,7 @@ This project is mainly designed based on the Android image compress API. Also, i
 
 ## 1 Background: Open source image libraries
 
-Now, on github, here are maily two image compress libraries for Android witch has a large number stars, namely, Luban and Compressor. But both of these two libraries has its pros and cons. Here we made the table below:
+Now, on github, here are maily two image compress libraries for Android witch has a large number stars, namely, Luban and Compressor. But both of these libraries has their pros and cons. Here we made the table below:
 
 |Library|Strength|Weakness|
 |:-:|:-|:-|
@@ -50,13 +50,15 @@ Now lets show you the functions and features of our library:
 
 - **Support Luban**: As mentationed, it provided an algorithm based on WeChat. Except that, you can also use Compressor to get more features.
 
-- **Support Compressor**: This strategy combined three Android image compressed methods, so you can get an exact output image size. Expecially, we, in our library, strengthend them, and provided more options to support more circumstances.
+- **Support Compressor**: This strategy combined three Android image compressed methods, so you can get an exact output image size. Expecially, we, in our library, strengthend them and provided more options to support more circumstances.
 
 - **Support RxJava callback**: By RxJava, you can specify thread of async tasks and result callback. In this library, we provided a Flowable object, you can use it to processed later.
 
 - **Support AsyncTask callback**: Except RxJava, you can also use AsyncTask to run background task, and get the result in main thread from callback.
 
 - **Support synchronous APIs**: Sometimes, synchronous APIs can be more useful. For example, you want to make an custom call, run and get the result of task all in current thread. To meet this requirement, we provided synchronous APIs.
+
+- **Support kotlin coroutines**: Now you can use the library in kotlin coroutines.
 
 - **Support more image sources types**: Most of the liraries, the required image type was File. But when we got the image data from camera APIs, it turn out to be byte array. So in other libraries, you have to transfer data from byte array to File. That means you have to write data to file system, witch no doubt may lower the performance of your application. Currently, our library support image source types include File, byte array, file path and Bitmap.
 
@@ -167,6 +169,10 @@ To finally get the result you have three options:
         })
     // Option 3: Use async and blocking API to get result in current thread
     val resultFile = compressor.get()
+    // Option 4: Get the result using kotlin coroutines
+    GlobalScope.launch {
+        val resultFile = compressor.get(Dispatchers.IO)
+    }
 ```
 
 If you want to use another strategy, you can simply use `Strategies.luban()` instead of `Strategies.compressor()` to switch. Excpet these two provided strategies, you can also make a custom strategy by implementing interface.
