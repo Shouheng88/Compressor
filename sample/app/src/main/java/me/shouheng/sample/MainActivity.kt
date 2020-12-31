@@ -24,6 +24,7 @@ import me.shouheng.compress.listener.CompressListener
 import me.shouheng.compress.naming.CacheNameFactory
 import me.shouheng.compress.strategy.Strategies
 import me.shouheng.compress.strategy.config.ScaleMode
+import me.shouheng.compress.utils.CImageUtils
 import me.shouheng.mvvm.base.CommonActivity
 import me.shouheng.mvvm.base.anno.ActivityConfiguration
 import me.shouheng.mvvm.comn.EmptyViewModel
@@ -60,14 +61,21 @@ class MainActivity : CommonActivity<ActivityMainBinding, EmptyViewModel>() {
     private var lubanLaunchType = LaunchType.LAUNCH
     private var lubanResultType = ResultType.FILE
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private var configArray = arrayOf(
-        Bitmap.Config.ARGB_8888,
-        Bitmap.Config.ALPHA_8,
-        Bitmap.Config.RGB_565,
-        Bitmap.Config.ARGB_4444,
-        Bitmap.Config.RGBA_F16,
-        Bitmap.Config.HARDWARE)
+    private var configArray = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        arrayOf(
+            Bitmap.Config.ARGB_8888,
+            Bitmap.Config.ALPHA_8,
+            Bitmap.Config.RGB_565,
+            Bitmap.Config.ARGB_4444,
+            Bitmap.Config.RGBA_F16,
+            Bitmap.Config.HARDWARE)
+    } else {
+        arrayOf(
+            Bitmap.Config.ARGB_8888,
+            Bitmap.Config.ALPHA_8,
+            Bitmap.Config.RGB_565,
+            Bitmap.Config.ARGB_4444)
+    }
     private var scaleArray = arrayOf(
         ScaleMode.SCALE_LARGER,
         ScaleMode.SCALE_SMALLER,
@@ -547,15 +555,13 @@ class MainActivity : CommonActivity<ActivityMainBinding, EmptyViewModel>() {
             return
         }
         val options = BitmapFactory.Options()
-        options.inJustDecodeBounds = true
-        BitmapFactory.decodeFile(filePath, options)
-        val actualWidth = options.outWidth
-        val actualHeight = options.outHeight
         options.inJustDecodeBounds = false
-        val bitmap = BitmapFactory.decodeFile(filePath, options)
+        var bitmap = BitmapFactory.decodeFile(filePath, options)
+        val angle = CImageUtils.getImageAngle(File(filePath))
+        if (angle != 0) bitmap = CImageUtils.rotateBitmap(bitmap, angle)
         binding.ivOriginal.setImageBitmap(bitmap)
         val size = bitmap.byteCount
-        binding.tvOriginal.text = "Original:\nwidth: $actualWidth\nheight:$actualHeight\nsize:$size"
+        binding.tvOriginal.text = "Original:\nwidth: ${bitmap.width}\nheight:${bitmap.height}\nsize:$size"
         binding.ivOriginal.tag = filePath
     }
 

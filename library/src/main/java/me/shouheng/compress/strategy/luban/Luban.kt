@@ -8,6 +8,7 @@ import me.shouheng.compress.utils.CFileUtils
 import me.shouheng.compress.utils.CImageUtils
 import java.io.File
 import java.io.IOException
+import kotlin.math.ceil
 
 /**
  * The compress algorithm by [Luban](https://github.com/Curzibn/Luban).
@@ -60,7 +61,7 @@ class Luban : SimpleStrategy() {
                 1
             } else if (longSide < 4990) {
                 2
-            } else if (longSide > 4990 && longSide < 10240) {
+            } else if (longSide in 4991..10239) {
                 4
             } else {
                 if (longSide / 1280 == 0) 1 else longSide / 1280
@@ -68,7 +69,7 @@ class Luban : SimpleStrategy() {
         } else if (scale <= 0.5625 && scale > 0.5) {
             if (longSide / 1280 == 0) 1 else longSide / 1280
         } else {
-            Math.ceil(longSide / (1280.0 / scale)).toInt()
+            ceil(longSide / (1280.0 / scale)).toInt()
         }
     }
 

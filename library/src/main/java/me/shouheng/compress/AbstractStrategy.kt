@@ -34,9 +34,7 @@ abstract class AbstractStrategy : RequestBuilder<File>(), Handler.Callback {
 
     /*------------------------------------------- protected level -------------------------------------------*/
 
-    /**
-     * Prepare original image size info before calculate the image sample size.
-     */
+    /** Prepare original image size info before calculate the image sample size.*/
     protected fun prepareImageSizeInfo() {
         if (srcBitmap != null) {
             this.srcWidth = srcBitmap!!.width
