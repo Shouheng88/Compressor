@@ -1,5 +1,3 @@
-![Banner](https://github.com/CostCost/Resources/blob/master/github/xbanner.jpg?raw=true)
-
 <h1 align="center">An easy to use image compress library for Android</h1>
 
 <p align="center">
@@ -30,40 +28,33 @@
     <a href="./README-zh.md">中文版</a>
 </p>
 
-This project is mainly designed based on the Android image compress API. Also, it provided two image compress implementions based on open souce libraries  [Luban](https://github.com/Curzibn/Luban) and [Compressor](https://github.com/zetbaitsu/Compressor). In this library, it provided interfaces for multiple and different types of image source and result -- file, byte array, bitmap etc. It provided sync and async API to meet more circumstances. And it put forward the struture so that you can easily and conveniently switch from different strategys mentationed above.
+## 1 Introduction
 
-## 1 Background: Open source image libraries
-
-Now, on github, here are maily two image compress libraries for Android witch has a large number stars, namely, Luban and Compressor. But both of these libraries has their pros and cons. Here we made the table below:
-
-|Library|Strength|Weakness|
-|:-:|:-|:-|
-|[Luban](https://github.com/Curzibn/Luban)|Based on the algorithm of WeChat|1. can't make an exact output image size；2. based on AsyncTask, do not support RxJava; 3. support only one image source type|
-|[Compressor](https://github.com/zetbaitsu/Compressor)|1. can make an exact output image size; 2. support RxJava|1. support only one output size strategy, if you have special requirement, you have to change the source code; 2. support only one image source type|
-
-Above, we summarized two most welcome libraries on Github. As we talked above, we want to design an libraries witch combine the strengths and discard the weakness of them. Next we will show the function and features of our library.
+This project is mainly designed based on the Android image compress API. It provided two image compress implementions based on algorithms of open souce libraries  [Luban](https://github.com/Curzibn/Luban) and [Compressor](https://github.com/zetbaitsu/Compressor) and introduced interfaces for different types of image sources and results. It provided sync and async API to meet more requirements. And it put forward the struture so that you can easily switch from different compress algorithms.
 
 ## 2 Functions and features
 
 Now lets show you the functions and features of our library:
 
-- **Support Luban**: As mentationed, it provided an algorithm based on WeChat. Except that, you can also use Compressor to get more features.
+- **Support Luban Algorithm**: As mentationed, it provided an algorithm based on WeChat.
 
-- **Support Compressor**: This strategy combined three Android image compressed methods, so you can get an exact output image size. Expecially, we, in our library, strengthend them and provided more options to support more circumstances.
+- **Support Compressor Algoruthm**: Differenct from Luban, you are able to get an exact image size.
 
-- **Support RxJava callback**: By RxJava, you can specify thread of async tasks and result callback. In this library, we provided a Flowable object, you can use it to processed later.
+- **Support RxJava callback**: We will return a Flowable object so you can use it as RxJava.
 
 - **Support AsyncTask callback**: Except RxJava, you can also use AsyncTask to run background task, and get the result in main thread from callback.
 
-- **Support synchronous APIs**: Sometimes, synchronous APIs can be more useful. For example, you want to make an custom call, run and get the result of task all in current thread. To meet this requirement, we provided synchronous APIs.
+- **Support kotlin coroutines**: Also, you can use the library in kotlin coroutines.
 
-- **Support kotlin coroutines**: Now you can use the library in kotlin coroutines.
+- **Support synchronous APIs**
 
-- **Support more image sources types**: Most of the liraries, the required image type was File. But when we got the image data from camera APIs, it turn out to be byte array. So in other libraries, you have to transfer data from byte array to File. That means you have to write data to file system, witch no doubt may lower the performance of your application. Currently, our library support image source types include File, byte array, file path and Bitmap.
+- **Support to stretch images by width/height/longer side/smaller side**
 
-- **Support more image result types**: Sometimes, when we got the compressed result, we have to process it later. In Android, we use Bitmap. So in this circumstance, it's better to get Bitmap than File. So, to meet this requirement, we provided result type of Bitmap.
+- **Support 3 image sources types**: Most of the liraries, the required image type was File. But when we got the image data from camera APIs, it turn out to be byte array. So in other libraries, you have to transfer data from byte array to File. That means you have to write data to file system, witch no doubt may lower the performance of your App.. Currently, our library support image source types include File, byte array, file path and Bitmap.
 
-- **Provided custom interfaces**: Except algorithms above, we also provided user custom interfaces. We built an structure so that user can easily and conveniently switch from different strategys. And a builder chain for user to elegantly call this library.
+- **Support 2 image result types**: Sometimes, when we got the compressed result, we have to process it later. In Android, we use Bitmap. In this circumstance, it's better to get Bitmap than File. So, to meet this requirement, we provided result type of Bitmap.
+
+- **Provided custom interfaces**: Except algorithms above, we also provided user custom interfaces. We built an structure so that user can easily and conveniently switch from different strategys.
 
 - **More**: To get more features and functions about this library, you can install our sample [APK](resources/app-debug.apk) to get more informations.
 
@@ -73,12 +64,12 @@ Now lets show you the functions and features of our library:
 
 ### 3.1 Introduce our library in Gradle
 
-It's convenient to introduce our lirary in your project. First, add  jcenter repository in your project:
+It's convenient to use our lirary in your project. 
+
+First, add  jcenter repository in your project:
 
 ```gradle
-repositories {
-    jcenter()
-}
+repositories { jcenter() }
 ```
 
 Then, add our library in your dependency:
@@ -89,115 +80,124 @@ implementation 'me.shouheng.compressor:compressor:latest-version'
 
 ### 3.2 Use our library
 
-In this article, we will show you some main points. For details, please install our sample App.
-
-First, you should use the static methods of Compress to get a an instance of it, which is all magic begins. It has three different factory methods:
+First, you should use the static methods of Compress to get a an instance of it, which is the magic begins. It has three different factory methods correspond to three different type of image sources:
 
 ```kotlin
-    // Factory 1: Use File to get Compress instance
-    val compress = Compress.with(this, file)
-    // Factory 2: Use byte array to get Compress instance
-    val compress = Compress.with(this, byteArray)
-    // Factory 3: Use Bitmap to get Compress instance
-    val compress = Compress.with(this, bitmap)
+// Factory 1: Use File to get Compress instance
+val compress = Compress.with(this, file)
+
+// Factory 2: Use byte array to get Compress instance
+val compress = Compress.with(this, byteArray)
+
+// Factory 3: Use Bitmap to get Compress instance
+val compress = Compress.with(this, bitmap)
 ```
 
-Then, you can call methods of Compress to config image options:
+Then, you can call methods of `compress` instance to config basic image options. Basic options are those used in all strategies. That's why you can easily switch from different algorithms.
 
 ```kotlin
-    compress
-        // Sepcify image quality
-        .setQuality(60)
-        // Specify output directory
-        .setTargetDir(PathUtils.getExternalPicturesPath())
-        // Specify callback of result
-        .setCompressListener(object : CompressListener {
-            override fun onStart() {
-                LogUtils.d(Thread.currentThread().toString())
-                ToastUtils.showShort("Start [Compressor,File]")
-            }
-    
-            override fun onSuccess(result: File?) {
-                LogUtils.d(Thread.currentThread().toString())
-                displayResult(result?.absolutePath)
-                ToastUtils.showShort("Success [Compressor,File] : $result")
-            }
-    
-            override fun onError(throwable: Throwable?) {
-                LogUtils.d(Thread.currentThread().toString())
-                ToastUtils.showShort("Error [Compressor,File] : $throwable")
-            }
-        })
+compress
+    // Sepcify image quality
+    .setQuality(60)
+    // Specify output directory
+    .setTargetDir(PathUtils.getExternalPicturesPath())
+    // Specify callback of result
+    .setCompressListener(object : CompressListener {
+        override fun onStart() {
+            // callback when compress start
+        }
+
+        override fun onSuccess(result: File?) {
+            // callback when compress succeed
+        }
+
+        override fun onError(throwable: Throwable?) {
+            // callback when compress error
+        }
+    })
 ```
 
-These are basic confiurations of Compress, by comments, you can find out meanings of every method.
-
-As above, we got a Compress oject. Then we could specify image compress strategy. Take Compressor strategy as example, we could use `Strategies.compressor()` to get instance of this strategy:
+Then we need to specify compress strategy (algorithm). Take Compressor strategy as an example, we could use `Strategies.compressor()` to get instance of this strategy. And config details about this strategy by `setMaxHeight`, `setMaxWidth` etc. Different algorithm might have different configurations. For details, you can refer to the comment of methods. Also, for keypoints, your can refer to 3.3 of this README.
 
 ```kotlin
 val compressor = compress
-        // Specify strategy
-        .strategy(Strategies.compressor())
-        .setConfig(config)
-        // Set desired output width and height
-        .setMaxHeight(100f)
-        .setMaxWidth(100f)
-        // Set desiged output scale mode
-        .setScaleMode(scaleMode)
+    // Specify strategy
+    .strategy(Strategies.compressor())
+    // Set desired output width and height
+    .setMaxHeight(100f)
+    .setMaxWidth(100f)
+    // Set desiged output scale mode
+    .setScaleMode(scaleMode)
 ```
 
-Below is the process of getting image compress result. As mentationed, for  File and Bitmap type results. The default result type is File, to get Bitmap, you need to call `asBitmap()` of Compressor.
-
-To finally get the result you have three options:
+Next, as mentioned above, if you want to get compressed image of Bitmap. You should use `asBitmap()` of `compressor`. Otherwise, the compressed result will be File type.
 
 ```kotlin
-    // Option 1: Use AsyncTask to run task and listener to get result
-    compressor.launch()
-    // Option 2: To transfer result to Flowable and use RxJava to specify thread and get result
-    val d = compressor
-        .asFlowable()
-        // Specify thread
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        // Subscribe and get result
-        .subscribe({
-            ToastUtils.showShort("Success [Compressor,File,Flowable] $it")
-            displayResult(it.absolutePath)
-        }, {
-            ToastUtils.showShort("Error [Compressor,File,Flowable] : $it")
-        })
-    // Option 3: Use async and blocking API to get result in current thread
-    val resultFile = compressor.get()
-    // Option 4: Get the result using kotlin coroutines
-    GlobalScope.launch {
-        val resultFile = compressor.get(Dispatchers.IO)
-    }
+compressor = compressor.asBitmap()
 ```
 
-If you want to use another strategy, you can simply use `Strategies.luban()` instead of `Strategies.compressor()` to switch. Excpet these two provided strategies, you can also make a custom strategy by implementing interface.
+To finally get the result you have 4 options correspond to 4 different ways async/sync api:
+
+```kotlin
+// Option 1: use AsyncTask to execute async task and to get result from callback
+compressor.launch()
+
+// Option 2: use Flowable and RxJava to get result
+val d = compressor
+    .asFlowable()
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+    .subscribe({ /* on succeed */ }, { /* on error */ })
+
+// Option 3: use sync and blocking API to get result in current thread
+val resultFile = compressor.get()
+
+// Option 4: get the result by kotlin coroutines
+GlobalScope.launch {
+    val resultFile = compressor.get(Dispatchers.IO)
+}
+```
+
+If you want to use another strategy, you can simply use `Strategies.luban()` instead of `Strategies.compressor()`. Excpet these two strategies, you can also make a custom strategy.
 
 So, the full code will be:
 
 ```kotlin
-    val compressor = Compress.with(this@MainActivity, file)
-        .strategy(Strategies.compressor())
-        .setConfig(config)
-        .setMaxHeight(100f)
-        .setMaxWidth(100f)
-        .setScaleMode(scaleMode)
-        .asBitmap()
-        .asFlowable()
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe({
-            ToastUtils.showShort("Success [Compressor,Bitmap,Flowable] $it")
-            displayResult(it)
-        }, {
-            ToastUtils.showShort("Error [Compressor,Bitmap,Flowable] : $it")
-        })
+val compressor = Compress.with(this@MainActivity, file)
+    .strategy(Strategies.compressor())
+    .setConfig(config)
+    .setMaxHeight(100f)
+    .setMaxWidth(100f)
+    .setScaleMode(scaleMode)
+    .asBitmap()
+    .asFlowable()
+    .subscribeOn(Schedulers.io())
+    .observeOn(AndroidSchedulers.mainThread())
+    .subscribe({
+        ToastUtils.showShort("Success [Compressor,Bitmap,Flowable] $it")
+        displayResult(it)
+    }, {
+        ToastUtils.showShort("Error [Compressor,Bitmap,Flowable] : $it")
+    })
 ```
 
-Elegant, isn't it?
+### 3.3 Detail configurations about compressor
+
+**1. ignoreIfSmaller**
+
+This filed used to specifiy action when the current image size is smaller than required size. If it's true, the image will be ignored and the origin image will be returned, otherwise, the origin image will be stretched to required size.
+
+**2. scaleMode**
+
+The scale mode is used to specify image stretching ways while current image size ratio differs from desired image size ratio. It has 4 options:
+
+- SCALE_LARGER: Scale according to larger side, another will change according to original image width/height ratio. For example: 1). If the original image is (W:1000, H:500), destination is (W:100, H:100), then the result size will be (W:100, H:50). 2). If the original image is (W:500, H:1000), destination is (W:100, H:100), then the result size will be (W:50, H:100).
+
+- SCALE_SMALLER: Scale according to smaller, another side will change according to original image width/height ratio. For example: 1). If the original image is (W:1000, H:500), destination is (W:100, H:100), then the result size will be (W:200, H:100). 2). If the original image is (W:500, H:1000), destination is (W:100, H:100), then the result size will be (W:100, H:200).
+
+- SCALE_WIDTH: Scale the width, and the height will change according to the image ratio. For example: 1). If the original image is (W:1000, H:500), destination is (W:100, H:100). then the result size will be (W:100, H:50). 2). If the original image is (W:500, H:1000), destination is (W:100, H:100), then the result size will be (W:100, H:200).
+
+- SCALE_HEIGHT: Scale the width, and the height will change according to the image ratio. For example: 1). If the original image is (W:1000, H:500), destination is (W:100, H:100). then the result size will be (W:200, H:100). 2). If the original image is (W:500, H:1000), destination is (W:100, H:100), then the result size will be (W:50, H:100).
 
 ## 3 More
 
