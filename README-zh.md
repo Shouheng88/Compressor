@@ -7,8 +7,7 @@
     <img src="https://img.shields.io/hexpm/l/plug.svg" alt="License" />
   </a>
   <a href="https://bintray.com/beta/#/easymark/Android/compressor?tab=overview">
-    <img src="https://img.shields.io/maven-metadata/v/https/dl.bintray.com/easymark/Android/me/shouheng/compressor/compressor/maven-metadata.xml.svg" alt="Version" />
-  </a>
+    <img src="https://img.shields.io/maven-metadata/v/https/s01.oss.sonatype.org/service/local/repo_groups/public/content/com/github/Shouheng88/compressor/maven-metadata.xml.svg" alt="Version" />
   <a href="https://www.codacy.com/manual/Shouheng88/Compressor?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Shouheng88/Compressor&amp;utm_campaign=Badge_Grade">
     <img src="https://api.codacy.com/project/badge/Grade/84a3602d08034493a4a62c73f7ad86f4" alt="Code Grade"/>
   </a>
@@ -56,13 +55,13 @@
 在项目中接入我们的库是非常简单的。首先，在项目的 Gradle 中加入 jcenter仓库：
 
 ```gradle
-repositories { jcenter() }
+repositories { mavenCentral() }
 ```
 
 然后，在项目的依赖中添加该库的依赖：
 
 ```gradle
-implementation 'me.shouheng.compressor:compressor:latest-version'
+implementation 'com.github.Shouheng88:compressor:latest-version'
 ```
 
 ### 3.2 使用我们库进行压缩
