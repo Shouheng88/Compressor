@@ -5,7 +5,7 @@
     <img src="https://img.shields.io/hexpm/l/plug.svg" alt="License" />
   </a>
   <a href="https://bintray.com/beta/#/easymark/Android/compressor?tab=overview">
-    <img src="https://img.shields.io/maven-metadata/v/https/dl.bintray.com/easymark/Android/me/shouheng/compressor/compressor/maven-metadata.xml.svg" alt="Version" />
+    <img src="https://img.shields.io/maven-metadata/v/https/s01.oss.sonatype.org/service/local/repo_groups/public/content/com/github/Shouheng88/compressor/maven-metadata.xml.svg" alt="Version" />
   </a>
   <a href="https://www.codacy.com/manual/Shouheng88/Compressor?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Shouheng88/Compressor&amp;utm_campaign=Badge_Grade">
     <img src="https://api.codacy.com/project/badge/Grade/84a3602d08034493a4a62c73f7ad86f4" alt="Code Grade"/>
@@ -17,7 +17,7 @@
     <img src="https://img.shields.io/badge/API-17%2B-blue.svg?style=flat-square" alt="Min Sdk Version" />
   </a>
    <a href="https://github.com/Shouheng88">
-    <img src="https://img.shields.io/badge/Author-CodeBrick-orange.svg?style=flat-square" alt="Author" />
+    <img src="https://img.shields.io/badge/Author-SHW-orange.svg?style=flat-square" alt="Author" />
   </a>
   <a target="_blank" href="https://shang.qq.com/wpa/qunwpa?idkey=2711a5fa2e3ecfbaae34bd2cf2c98a5b25dd7d5cc56a3928abee84ae7a984253">
     <img src="https://img.shields.io/badge/QQ%E7%BE%A4-1018235573-orange.svg?style=flat-square" alt="QQ Group" />
@@ -69,13 +69,13 @@ It's convenient to use our lirary in your project.
 First, add  jcenter repository in your project:
 
 ```gradle
-repositories { jcenter() }
+repositories { mavenCentral() }
 ```
 
 Then, add our library in your dependency:
 
 ```gradle
-implementation 'me.shouheng.compressor:compressor:latest-version'
+implementation 'com.github.Shouheng88:compressor:latest-version'
 ```
 
 ### 3.2 Use our library
