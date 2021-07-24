@@ -1,4 +1,4 @@
-package me.shouheng.sample
+package me.shouheng.sample.view
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -10,13 +10,12 @@ import io.reactivex.schedulers.Schedulers
 import me.shouheng.compress.Compress
 import me.shouheng.compress.strategy.Strategies
 import me.shouheng.compress.strategy.config.ScaleMode
-import me.shouheng.mvvm.base.CommonActivity
-import me.shouheng.mvvm.base.anno.ActivityConfiguration
-import me.shouheng.mvvm.comn.EmptyViewModel
+import me.shouheng.sample.R
 import me.shouheng.sample.databinding.ActivitySampleBinding
 import me.shouheng.utils.ui.ImageUtils
-import me.shouheng.utils.ui.ToastUtils
 import me.shouheng.utils.ui.ViewUtils
+import me.shouheng.vmlib.base.CommonActivity
+import me.shouheng.vmlib.comn.EmptyViewModel
 import java.io.ByteArrayOutputStream
 
 /**
@@ -25,12 +24,15 @@ import java.io.ByteArrayOutputStream
  * @author Shouheng Wang
  * @version 2019/5/17 22:04
  */
-@ActivityConfiguration(layoutResId = R.layout.activity_sample)
-class SampleActivity : CommonActivity<ActivitySampleBinding, EmptyViewModel>() {
+class SampleActivity : CommonActivity<EmptyViewModel, ActivitySampleBinding>() {
+
+    override fun getLayoutResId(): Int = R.layout.activity_sample
 
     override fun doCreateView(savedInstanceState: Bundle?) {
         val d = Observable.create<Bitmap> {
-            val bitmap = Compress.with(this, BitmapFactory.decodeResource(resources, R.drawable.img_lena))
+            val bitmap = Compress.with(this, BitmapFactory.decodeResource(resources,
+                R.drawable.img_lena
+            ))
                 .strategy(Strategies.compressor())
                 .setMaxHeight(100f)
                 .setMaxHeight(120f)
@@ -45,7 +47,9 @@ class SampleActivity : CommonActivity<ActivitySampleBinding, EmptyViewModel>() {
             toast("error : $it")
         })
         val d2 = Observable.create<Bitmap> {
-            var bitmap = BitmapFactory.decodeResource(resources, R.drawable.img_lena)
+            var bitmap = BitmapFactory.decodeResource(resources,
+                R.drawable.img_lena
+            )
             val out = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
             val byteArray = out.toByteArray()

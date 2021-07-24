@@ -32,3 +32,9 @@ task clean(type: Delete) {
 subprojects {
     tasks.withType(Javadoc).all { enabled = false }
 }
+
+ext {
+    androidUtilsVersion = '2.1.7'
+    androidVMLibVersion = '1.7.1'
+    androidUIXVersion = '1.8.1'
+}

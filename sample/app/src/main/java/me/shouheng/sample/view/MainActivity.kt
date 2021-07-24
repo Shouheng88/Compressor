@@ -1,16 +1,11 @@
-package me.shouheng.sample
+package me.shouheng.sample.view
 
 import android.app.Activity
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
-import android.support.annotation.RequiresApi
 import android.text.TextUtils
-import android.view.View
-import android.widget.AdapterView
 import com.bumptech.glide.Glide
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -25,27 +20,24 @@ import me.shouheng.compress.naming.CacheNameFactory
 import me.shouheng.compress.strategy.Strategies
 import me.shouheng.compress.strategy.config.ScaleMode
 import me.shouheng.compress.utils.CImageUtils
-import me.shouheng.mvvm.base.CommonActivity
-import me.shouheng.mvvm.base.anno.ActivityConfiguration
-import me.shouheng.mvvm.comn.EmptyViewModel
+import me.shouheng.sample.R
+import me.shouheng.sample.data.*
 import me.shouheng.sample.databinding.ActivityMainBinding
+import me.shouheng.sample.utils.*
 import me.shouheng.utils.app.IntentUtils
-import me.shouheng.utils.permission.Permission
-import me.shouheng.utils.permission.PermissionUtils
-import me.shouheng.utils.permission.callback.OnGetPermissionCallback
+import me.shouheng.utils.ktx.checkCameraPermission
+import me.shouheng.utils.ktx.onDebouncedClick
+import me.shouheng.utils.ktx.start
 import me.shouheng.utils.stability.L
 import me.shouheng.utils.store.FileUtils
 import me.shouheng.utils.store.IOUtils
 import me.shouheng.utils.store.PathUtils
+import me.shouheng.vmlib.base.CommonActivity
+import me.shouheng.vmlib.comn.EmptyViewModel
 import java.io.File
 
-@ActivityConfiguration(layoutResId = R.layout.activity_main)
-class MainActivity : CommonActivity<ActivityMainBinding, EmptyViewModel>() {
-
-    companion object {
-        const val REQUEST_IMAGE_CAPTURE     = 0x0100
-        const val REQUEST_SELECT_IMAGE      = 0x0101
-    }
+/** Main page. */
+class MainActivity : CommonActivity<EmptyViewModel, ActivityMainBinding>() {
 
     private lateinit var originalFile: File
 
@@ -61,35 +53,16 @@ class MainActivity : CommonActivity<ActivityMainBinding, EmptyViewModel>() {
     private var lubanLaunchType = LaunchType.LAUNCH
     private var lubanResultType = ResultType.FILE
 
-    private var configArray = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        arrayOf(
-            Bitmap.Config.ARGB_8888,
-            Bitmap.Config.ALPHA_8,
-            Bitmap.Config.RGB_565,
-            Bitmap.Config.ARGB_4444,
-            Bitmap.Config.RGBA_F16,
-            Bitmap.Config.HARDWARE)
-    } else {
-        arrayOf(
-            Bitmap.Config.ARGB_8888,
-            Bitmap.Config.ALPHA_8,
-            Bitmap.Config.RGB_565,
-            Bitmap.Config.ARGB_4444)
-    }
-    private var scaleArray = arrayOf(
-        ScaleMode.SCALE_LARGER,
-        ScaleMode.SCALE_SMALLER,
-        ScaleMode.SCALE_WIDTH,
-        ScaleMode.SCALE_HEIGHT)
-    private var sourceTypeArray = arrayOf(SourceType.FILE, SourceType.BYTE_ARRAY, SourceType.BITMAP)
-    private var resultTypeArray = arrayOf(ResultType.FILE, ResultType.BITMAP)
-    private var launchTypeArray = arrayOf(LaunchType.LAUNCH, LaunchType.AS_FLOWABLE, LaunchType.GET, LaunchType.COROUTINES)
+    override fun getLayoutResId(): Int = R.layout.activity_main
 
     override fun doCreateView(savedInstanceState: Bundle?) {
-        configViews()
+        configOptionsViews()
+        configButtons()
+        configSourceViews()
+        observes()
     }
 
-    private fun configViews() {
+    private fun configSourceViews() {
         binding.ivOriginal.setOnLongClickListener {
             val tag = binding.ivOriginal.tag
             if (tag != null) {
@@ -99,143 +72,65 @@ class MainActivity : CommonActivity<ActivityMainBinding, EmptyViewModel>() {
             }
             true
         }
-        binding.btnCapture.setOnClickListener {
-            PermissionUtils.checkPermissions(this, OnGetPermissionCallback {
-                val file = File(PathUtils.getExternalPicturesPath(), "${System.currentTimeMillis()}.jpeg")
+        binding.btnCapture.onDebouncedClick {
+            checkCameraPermission {
+                val file = File(PathUtils.getExternalPicturesPath(),
+                    "${System.currentTimeMillis()}.jpeg")
                 val succeed = FileUtils.createOrExistsFile(file)
                 if (succeed) {
                     originalFile = file
-                    val uri = Utils.getUriFromFile(this@MainActivity, file)
-                    startActivityForResult(IntentUtils.getCaptureIntent(uri), REQUEST_IMAGE_CAPTURE)
+                    startActivityForResult(
+                        IntentUtils.getCaptureIntent(file.uri(context)),
+                        REQUEST_IMAGE_CAPTURE
+                    )
                 } else{
                     toast("Can't create file!")
                 }
-            }, Permission.CAMERA, Permission.STORAGE)
-        }
-        binding.btnChoose.setOnClickListener {
-            PermissionUtils.checkStoragePermission(this) {
-                val intent = Intent(Intent.ACTION_PICK)
-                intent.type = "image/*"
-                startActivityForResult(intent, REQUEST_SELECT_IMAGE)
             }
         }
-        binding.btnSample.setOnClickListener {
-            startActivity(SampleActivity::class.java)
-        }
-
-        /* configuration for luban */
-        binding.aspLubanSourceType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // nothing
-            }
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                lubanSourceType = sourceTypeArray[position]
-            }
-        }
-        binding.aspLubanResult.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // nothing
-            }
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                lubanResultType = resultTypeArray[position]
-            }
-        }
-        binding.aspLubanLaunch.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // nothing
-            }
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                lubanLaunchType = launchTypeArray[position]
-            }
-        }
-        binding.btnLuban.setOnClickListener {
-            compressByLuban()
-        }
-
-        /* configuration for compressor */
-        binding.aspSourceType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // nothing
-            }
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                compressorSourceType = sourceTypeArray[position]
-            }
-        }
-        binding.aspColor.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    config = configArray[position]
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // nothing
-            }
-        }
-        binding.aspScale.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // nothing
-            }
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                scaleMode = scaleArray[position]
-            }
-        }
-        binding.aspCompressorResult.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // empty
-            }
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                compressorResultType = resultTypeArray[position]
-            }
-        }
-        binding.aspCompressorLaunch.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // do nothing
-            }
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                compressorLaunchType = launchTypeArray[position]
-            }
-        }
-        binding.btnCompressor.setOnClickListener {
-            compressByCompressor()
-        }
-
-        /* configuration for custom */
-        binding.btnCustom.setOnClickListener {
-            compressByCustom()
-        }
+        binding.btnChoose.onDebouncedClick { chooseFromAlbum() }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when(requestCode) {
-            REQUEST_IMAGE_CAPTURE -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    displayOriginal(originalFile.absolutePath)
-                }
+    private fun configButtons() {
+        binding.btnLuban.onDebouncedClick { compressByAutomatic() }
+        binding.btnCompressor.onDebouncedClick{ compressByConcrete() }
+        binding.btnCustom.onDebouncedClick { compressByCustom() }
+        binding.btnSample.onDebouncedClick { start(SampleActivity::class.java) }
+    }
+
+    private fun configOptionsViews() {
+        /* configuration for automatic. */
+        binding.aspLubanSourceType.onItemSelected { lubanSourceType = sourceTypes[it] }
+        binding.aspLubanResult.onItemSelected { lubanResultType = resultTypes[it] }
+        binding.aspLubanLaunch.onItemSelected { lubanLaunchType = launchTypes[it] }
+
+        /* configuration for concrete. */
+        binding.aspSourceType.onItemSelected { compressorSourceType = sourceTypes[it] }
+        binding.aspColor.onItemSelected {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                config = colorConfigs[it]
             }
-            REQUEST_SELECT_IMAGE -> {
-                if (data != null) {
-                    val uri = data.data
-                    val cursor = contentResolver.query(uri!!, arrayOf(MediaStore.Images.Media.DATA), null, null, null)
-                    cursor?.moveToFirst()
-                    val index = cursor?.getColumnIndex(MediaStore.Images.Media.DATA)
-                    val path = if (index == null) { null } else cursor.getString(index)
-                    cursor?.close()
-                    displayOriginal(path)
-                }
+        }
+
+        binding.aspScale.onItemSelected { scaleMode = scaleModes[it] }
+        binding.aspCompressorResult.onItemSelected { compressorResultType = resultTypes[it] }
+        binding.aspCompressorLaunch.onItemSelected { compressorLaunchType = launchTypes[it] }
+    }
+
+    private fun observes() {
+        onResult(REQUEST_IMAGE_CAPTURE) { ret, _ ->
+            if (ret == Activity.RESULT_OK) {
+                displayOriginal(originalFile.absolutePath)
+            }
+        }
+        onResult(REQUEST_SELECT_IMAGE) { ret, data ->
+            if (ret == Activity.RESULT_OK && data != null) {
+                displayOriginal(data.data.getPath(context))
             }
         }
     }
 
-    private fun compressByCompressor() {
+    private fun compressByConcrete() {
         val tag = binding.ivOriginal.tag
         if (tag != null) {
             val filePath = tag as String
@@ -379,7 +274,7 @@ class MainActivity : CommonActivity<ActivityMainBinding, EmptyViewModel>() {
         }
     }
 
-    private fun compressByLuban() {
+    private fun compressByAutomatic() {
         val tag = binding.ivOriginal.tag
         if (tag != null) {
             val filePath = tag as String
@@ -586,32 +481,5 @@ class MainActivity : CommonActivity<ActivityMainBinding, EmptyViewModel>() {
         binding.ivResult.setImageBitmap(bitmap)
         val size = bitmap.byteCount
         binding.tvResult.text = "Result:\nwidth: $actualWidth\nheight:$actualHeight\nsize:$size"
-    }
-
-    /**
-     * Compress task launch type
-     */
-    enum class LaunchType {
-        LAUNCH,
-        AS_FLOWABLE,
-        GET,
-        COROUTINES
-    }
-
-    /**
-     * Compress data source type
-     */
-    enum class SourceType {
-        FILE,
-        BYTE_ARRAY,
-        BITMAP
-    }
-
-    /**
-     * Result type
-     */
-    enum class ResultType {
-        BITMAP,
-        FILE
     }
 }

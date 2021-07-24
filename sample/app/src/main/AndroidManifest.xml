@@ -17,14 +17,14 @@
         android:supportsRtl="true"
         android:name=".App"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".view.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".SampleActivity"/>
+        <activity android:name=".view.SampleActivity"/>
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="me.shouheng.sample.provider"
