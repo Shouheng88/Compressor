@@ -25,7 +25,7 @@ import java.io.File
  */
 class Compress private constructor(
     private val context: Context,
-    private val imageSource: ImageSource<Any>
+    private val imageSource: ImageSource<*>
 ) {
     private var format: Bitmap.CompressFormat = Config.DEFAULT_COMPRESS_FORMAT
     private var quality: Int = Config.DEFAULT_COMPRESS_QUALITY
@@ -100,7 +100,6 @@ class Compress private constructor(
     fun <T : AbstractStrategy> strategy(strategy: T): T {
         return strategy.apply {
             setImageSource(imageSource)
-            setSrcData(srcData)
             setFormat(format)
             setQuality(quality)
             setAutoRecycle(autoRecycle)
@@ -113,17 +112,17 @@ class Compress private constructor(
 
         /** Get a compress instance with image source type [File]. */
         fun with(context: Context, file: File): Compress {
-            return Compress(context, FileImageSource(file), null, null)
+            return Compress(context, FileImageSource(file))
         }
 
         /** Get a compress instance with image source type [Bitmap]. */
         fun with(context: Context, srcBitmap: Bitmap): Compress {
-            return Compress(context, null, BitmapImageSource(srcBitmap), null)
+            return Compress(context, BitmapImageSource(srcBitmap))
         }
 
         /** Get a compress instance with image source type of [ByteArray]. */
         fun with(context: Context, srcData: ByteArray): Compress {
-            return Compress(context, null, null, ByteArrayImageSource(srcData))
+            return Compress(context, ByteArrayImageSource(srcData))
         }
     }
 }

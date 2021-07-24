@@ -21,7 +21,7 @@ abstract class RequestBuilder<R> : Handler.Callback {
 
     private var compressListener: Callback<R>? = null
     private var abstractStrategy: AbstractStrategy? = null
-    protected var imageSource: ImageSource<Any>? = null
+    protected var imageSource: ImageSource<*>? = null
 
     private val handler = Handler(Looper.getMainLooper(), this)
 
@@ -39,14 +39,14 @@ abstract class RequestBuilder<R> : Handler.Callback {
     }
 
     /** Set the image source. */
-    internal fun setImageSource(imageSource: ImageSource<Any>) {
+    internal fun setImageSource(imageSource: ImageSource<*>) {
         this.imageSource = imageSource
     }
 
     /** Blocking method used to get the compressed result in current thread. */
     abstract fun get(): R?
 
-    /** Get the result using kotlin coroutines, for example [Dispatchers.IO] */
+    /** Get the result using kotlin coroutines, for example [Dispatchers.IO]. */
     abstract suspend fun get(coroutineContext: CoroutineContext): R?
 
     /** Use RxJava to get the result. */

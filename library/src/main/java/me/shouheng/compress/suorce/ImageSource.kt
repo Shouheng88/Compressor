@@ -2,30 +2,44 @@ package me.shouheng.compress.suorce
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import me.shouheng.compress.utils.CFileUtils
+import me.shouheng.compress.utils.CImageUtils
+import me.shouheng.compress.utils.CLog
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
 
 /**
  * The image source.
  *
- * @Author wangshouheng
+ * @Author Shouheng Wang
  * @Time 2021/7/24
  */
 interface ImageSource<T> {
 
-    fun image(): T
+    /** Get the source image. */
+    fun source(): SourceData<T>
 
+    /** Get the source image size. */
     fun size(): Pair<Int, Int>
 
-    fun origin(options: BitmapFactory.Options): Bitmap
+    /** Get origin image according to [options]. */
+    fun bitmap(options: BitmapFactory.Options): SourceBitmap
 
-    fun needCompress(): Boolean
+    /** Rotate image if necessary. */
+    fun rotation(src: Bitmap): Bitmap = src
 
-    fun rotation()
+    /** Should ignore the image according to ignore size [size]. */
+    fun ignore(size: Int): Boolean = false
+
+    /** Copy image to [dest] if ignored. */
+    fun copyTo(dest: File): Boolean = true
 }
 
-class FileImageSource(val file: File) : ImageSource<File> {
+class FileImageSource(private val file: File) : ImageSource<File> {
 
-    override fun image(): File = file
+    override fun source(): SourceData<File> = FileSourceData(file)
 
     override fun size(): Pair<Int, Int> {
         val options = BitmapFactory.Options()
@@ -35,34 +49,57 @@ class FileImageSource(val file: File) : ImageSource<File> {
         return Pair(options.outWidth, options.outHeight)
     }
 
-    override fun origin(options: BitmapFactory.Options): Bitmap {
+    override fun bitmap(options: BitmapFactory.Options): SourceBitmap {
+        val bitmap = BitmapFactory.decodeFile(file.absolutePath, options)
+        return SourceBitmap(bitmap, false)
+    }
+
+    override fun rotation(src: Bitmap): Bitmap {
+        val orientation = CImageUtils.getImageAngle(file)
+        if (orientation != 0) {
+            return CImageUtils.rotateBitmap(src, orientation)
+        }
+        return src
+    }
+
+    override fun ignore(size: Int): Boolean {
+        return size <= 0 || !file.exists() || file.length() < size shl 10
+    }
+
+    override fun copyTo(dest: File): Boolean {
+        return try {
+            CFileUtils.copyFile(FileInputStream(file), FileOutputStream(dest))
+            true
+        } catch (e: FileNotFoundException) {
+            CLog.e("Error copying file : $e")
+            false
+        }
     }
 }
 
-class ByteArrayImageSource(val byteArray: ByteArray) : ImageSource<ByteArray> {
+class ByteArrayImageSource(private val bytes: ByteArray) : ImageSource<ByteArray> {
 
-    override fun image(): ByteArray = byteArray
+    override fun source(): SourceData<ByteArray> = ByteArraySourceData(bytes)
 
     override fun size(): Pair<Int, Int> {
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
         options.inSampleSize = 1
-        BitmapFactory.decodeByteArray(byteArray, 0, srcData!!.size, options)
+        BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
         return Pair(options.outWidth, options.outHeight)
     }
 
-    override fun origin(options: BitmapFactory.Options): Bitmap {
+    override fun bitmap(options: BitmapFactory.Options): SourceBitmap {
+        val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
+        return SourceBitmap(bitmap, false)
     }
 }
 
-class BitmapImageSource(val bitmap: Bitmap) : ImageSource<Bitmap> {
+class BitmapImageSource(private val bitmap: Bitmap) : ImageSource<Bitmap> {
 
-    override fun image(): Bitmap = bitmap
+    override fun source(): SourceData<Bitmap> = BitmapSourceData(bitmap)
 
-    override fun size(): Pair<Int, Int> {
-        return Pair(bitmap.width, bitmap.height)
-    }
+    override fun size(): Pair<Int, Int> = Pair(bitmap.width, bitmap.height)
 
-    override fun origin(options: BitmapFactory.Options): Bitmap {
-    }
+    override fun bitmap(options: BitmapFactory.Options): SourceBitmap = SourceBitmap(bitmap, true)
 }

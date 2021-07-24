@@ -120,57 +120,39 @@ abstract class SimpleStrategy : AbstractStrategy() {
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
     }
 
-    /**
-     * Compress the source bitmap by scaling it.
-     *
-     * @return the compressed bitmap
-     */
+    /** Compress the source bitmap by scaling it. */
     private fun compressByScale(): Bitmap? {
+        imageSource?:return null
+
         prepareImageSizeInfo()
 
         val inSampleSize = calInSampleSize()
         val options = BitmapFactory.Options()
         options.inSampleSize = inSampleSize
-        var bitmap: Bitmap? = null
+        val origin = imageSource!!.bitmap(options)
+        var result = origin.bitmap
 
-        if (srcBitmap != null) {
-            // scale bitmap according to inSampleSize
-            val reqWidth = (srcWidth * 1f / inSampleSize).toInt()
-            val reqHeight = (srcHeight * 1f / inSampleSize).toInt()
-            val scaledBitmap = Bitmap.createBitmap(reqWidth, reqHeight, Bitmap.Config.ARGB_8888)
-            val ratioX = reqWidth / srcBitmap!!.width.toFloat()
-            val ratioY = reqHeight / srcBitmap!!.height.toFloat()
+        if (origin.needScale) {
+            val bitmap = origin.bitmap
+            // Scale bitmap according to inSampleSize
+            val reqWidth = (srcWidth.toFloat() / inSampleSize).toInt()
+            val reqHeight = (srcHeight.toFloat() / inSampleSize).toInt()
+            result = Bitmap.createBitmap(reqWidth, reqHeight, Bitmap.Config.ARGB_8888)
+            val ratioX = reqWidth / bitmap.width.toFloat()
+            val ratioY = reqHeight / bitmap.height.toFloat()
             val middleX = reqWidth / 2.0f
             val middleY = reqHeight / 2.0f
             val scaleMatrix = Matrix()
             scaleMatrix.setScale(ratioX, ratioY, middleX, middleY)
-            val canvas = Canvas(scaledBitmap)
+            val canvas = Canvas(result)
             canvas.matrix = scaleMatrix
             canvas.drawBitmap(
-                srcBitmap!!, middleX - srcWidth / 2,
+                bitmap, middleX - srcWidth / 2,
                 middleY - srcHeight / 2, Paint(Paint.FILTER_BITMAP_FLAG)
             )
-
-            // the user don't need the source bitmap
-            if (autoRecycle) {
-                srcBitmap!!.recycle()
-            }
-            return scaledBitmap
-        } else if (srcData != null || srcFile != null) {
-            // scale bitmap by bitmap decode options
-            if (srcFile != null) {
-                bitmap = BitmapFactory.decodeFile(srcFile!!.absolutePath, options)
-            } else {
-                bitmap = BitmapFactory.decodeByteArray(srcData, 0, srcData!!.size, options)
-            }
         }
 
-        if (srcFile != null) {
-            val orientation = CImageUtils.getImageAngle(srcFile!!)
-            if (orientation != 0) {
-                bitmap = CImageUtils.rotateBitmap(bitmap!!, orientation)
-            }
-        }
-        return bitmap
+        // Rotate bitmap if necessary.
+        return imageSource?.rotation(result)
     }
 }

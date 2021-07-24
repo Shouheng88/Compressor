@@ -1,7 +1,6 @@
 package me.shouheng.compress
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Handler
 import me.shouheng.compress.request.BitmapBuilder
 import me.shouheng.compress.strategy.config.Config
@@ -40,10 +39,6 @@ abstract class AbstractStrategy : RequestBuilder<File>(), Handler.Callback {
         throw IllegalStateException("This #getBitmap() method is not implemented by your strategy.")
     }
 
-    internal fun setSrcFile(srcFile: File?) {
-        this.srcFile = srcFile
-    }
-
     internal fun setFormat(format: Bitmap.CompressFormat) {
         this.format = format
     }
@@ -54,14 +49,6 @@ abstract class AbstractStrategy : RequestBuilder<File>(), Handler.Callback {
 
     internal fun setOutFile(outFile: File) {
         this.outFile = outFile
-    }
-
-    internal fun setSrcBitmap(srcBitmap: Bitmap?) {
-        this.srcBitmap = srcBitmap
-    }
-
-    internal fun setSrcData(srcData: ByteArray?) {
-        this.srcData = srcData
     }
 
     /**
