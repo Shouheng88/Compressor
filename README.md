@@ -170,7 +170,7 @@ To finally get the result you have 4 options correspond to 4 different ways asyn
 compressor.launch()
 
 // Option 2: use Flowable and RxJava to get result
-val d = compressor
+compressor
     .asFlowable()
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
@@ -192,12 +192,14 @@ If you want to use another strategy, you can simply use `Strategies.luban()` ins
 So, the full code will be:
 
 ```kotlin
-val compressor = Compress.with(this@MainActivity, file)
-    .strategy(Strategies.compressor())
-    .setConfig(config)
-    .setMaxHeight(100f)
-    .setMaxWidth(100f)
-    .setScaleMode(scaleMode)
+// Example of RxJava, also support other methods.
+Compress.with(this@MainActivity, file)
+    .concrete { // config the concrete algorithm
+        this.config = colorConfig
+        this.maxWidth = 100f
+        this.maxHeight = 100f
+        this.scaleMode = imageScaleMode
+    }
     .asBitmap()
     .asFlowable()
     .subscribeOn(Schedulers.io())
