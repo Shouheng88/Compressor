@@ -7,20 +7,35 @@ import android.os.Looper
 import android.os.Message
 import io.reactivex.Flowable
 import kotlinx.coroutines.Dispatchers
+import me.shouheng.compress.suorce.ImageSource
 import kotlin.coroutines.CoroutineContext
 
-/**
- * The request builder object. Used to build the compress request.
- * It contains many useful methods like [.notifyCompressSuccess].
- * This class has two children, [AbstractStrategy] and
- * [me.shouheng.compress.request.BitmapBuilder]
- *
- * @param <T> the required result type
- */
-abstract class RequestBuilder<T> : Handler.Callback {
+interface Algorithm<R> {
+    /** Blocking method used to get the compressed result in current thread. */
+    fun get(): R?
 
-    private var compressListener: Callback<T>? = null
+    /** Get the result using kotlin coroutines, for example [Dispatchers.IO]. */
+    suspend fun get(coroutineContext: CoroutineContext): R?
+
+    /** Use RxJava to get the result. */
+    fun asFlowable(): Flowable<R>
+
+    /** Launch the compressor task in [AsyncTask]. */
+    fun launch()
+}
+
+/**
+ * The request builder object. Used to build the compress request. It contains many useful methods
+ * like [notifyCompressSuccess] etc. This class has two children [AbstractStrategy] and
+ * [me.shouheng.compress.request.BitmapBuilder] by default.
+ *
+ * @param <R> the result type.
+ */
+abstract class RequestBuilder<R> : Handler.Callback, Algorithm<R> {
+
+    private var compressListener: Callback<R>? = null
     private var abstractStrategy: AbstractStrategy? = null
+    protected var imageSource: ImageSource<*>? = null
 
     private val handler = Handler(Looper.getMainLooper(), this)
 
@@ -37,38 +52,23 @@ abstract class RequestBuilder<T> : Handler.Callback {
         return abstractStrategy!!.getBitmap()
     }
 
-    /**
-     * Blocking method used to get the compressed result in current thread.
-     */
-    abstract fun get(): T?
-
-    /**
-     * Get the result using kotlin coroutines, for example [Dispatchers.IO]
-     */
-    abstract suspend fun get(coroutineContext: CoroutineContext): T?
-
-    /**
-     * Use RxJava to get the result
-     */
-    abstract fun asFlowable(): Flowable<T>
-
-    /**
-     * Launch the compressor task in [AsyncTask]
-     */
-    abstract fun launch()
+    /** Set the image source. */
+    internal fun setImageSource(imageSource: ImageSource<*>) {
+        this.imageSource = imageSource
+    }
 
     override fun handleMessage(msg: Message): Boolean {
-        if (compressListener == null) return false
+        compressListener ?: return false
         when (msg.what) {
             MSG_COMPRESS_START -> compressListener?.onStart()
-            MSG_COMPRESS_SUCCESS -> compressListener?.onSuccess(msg.obj as T)
+            MSG_COMPRESS_SUCCESS -> compressListener?.onSuccess(msg.obj as R)
             MSG_COMPRESS_ERROR -> compressListener?.onError(msg.obj as Throwable)
             else -> { /* noop */ }
         }
         return false
     }
 
-    fun setCompressListener(compressListener: Callback<T>?): RequestBuilder<T> {
+    fun setCompressListener(compressListener: Callback<R>?): RequestBuilder<R> {
         this.compressListener = compressListener
         return this
     }
@@ -81,7 +81,7 @@ abstract class RequestBuilder<T> : Handler.Callback {
         handler.sendMessage(handler.obtainMessage(MSG_COMPRESS_START))
     }
 
-    protected fun notifyCompressSuccess(result: T) {
+    protected fun notifyCompressSuccess(result: R) {
         handler.sendMessage(handler.obtainMessage(MSG_COMPRESS_SUCCESS, result))
     }
 
@@ -91,23 +91,17 @@ abstract class RequestBuilder<T> : Handler.Callback {
 
     interface Callback<T> {
 
-        /**
-         * Will be called when start to compress.
-         */
+        /** Will be called when start to compress. */
         fun onStart()
 
         /**
          * Will be called when finish compress.
-         *
+         *y
          * @param result the compressed image
          */
         fun onSuccess(result: T)
 
-        /**
-         * Will be called when error occurred.
-         *
-         * @param throwable the throwable exception
-         */
+        /** Will be called when error occurred. */
         fun onError(throwable: Throwable)
     }
 

@@ -13,7 +13,7 @@ object CImageUtils {
      * Return whether given bitmap is empty: null or no pixel.
      *
      * @param src the source bitmap
-     * @return    whether the bitmap is empty
+     * @return whether the bitmap is empty
      */
     fun isEmptyBitmap(src: Bitmap?): Boolean {
         return src == null || src.width == 0 || src.height == 0
@@ -22,9 +22,9 @@ object CImageUtils {
     /**
      * Need the image compress according to the file size and the least compress size.
      *
-     * @param filePath          file path
+     * @param filePath file path
      * @param leastCompressSize least compress size
-     * @return                  true if need to compress
+     * @return true if need to compress
      */
     fun needCompress(filePath: String, leastCompressSize: Int): Boolean {
         if (leastCompressSize > 0) {
@@ -38,7 +38,7 @@ object CImageUtils {
      * Get angle from image attribute.
      *
      * @param file the image file
-     * @return     the angle of image
+     * @return the angle of image
      */
     fun getImageAngle(file: File): Int {
         val exif: ExifInterface
@@ -60,8 +60,8 @@ object CImageUtils {
      * Rotate given bitmap and return the result.
      *
      * @param srcBitmap the source bitmap
-     * @param angle     the angle to rotate
-     * @return          the rotated bitmap
+     * @param angle the angle to rotate
+     * @return the rotated bitmap
      */
     fun rotateBitmap(srcBitmap: Bitmap, angle: Int): Bitmap {
         val matrix = Matrix()

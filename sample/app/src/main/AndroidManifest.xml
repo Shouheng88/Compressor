@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-    <uses-sdk tools:overrideLibrary="me.shouheng.mvvm,me.shouheng.uix"/>
+    <uses-sdk tools:overrideLibrary="me.shouheng.vmlib,me.shouheng.uix,me.shouheng.uix.pages,me.shouheng.uix.widget,me.shouheng.uix.common,me.shouheng.vmlib.network"/>
 
     <application
         android:allowBackup="true"
@@ -17,14 +17,14 @@
         android:supportsRtl="true"
         android:name=".App"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".view.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".SampleActivity"/>
+        <activity android:name=".view.SampleActivity"/>
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="me.shouheng.sample.provider"

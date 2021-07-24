@@ -3,10 +3,8 @@ package me.shouheng.compress.naming
 import android.graphics.Bitmap
 import java.util.Random
 
-/**
- * Default name factory implementation
- */
-class DefaultNameFactory private constructor() : CacheNameFactory {
+/** Default name factory implementation. */
+object DefaultNameFactory : CacheNameFactory {
 
     override fun getFileName(format: Bitmap.CompressFormat): String {
         return (System.currentTimeMillis() + Random().nextInt()).toString() + when(format) {
@@ -14,9 +12,5 @@ class DefaultNameFactory private constructor() : CacheNameFactory {
             Bitmap.CompressFormat.JPEG -> ".jpeg"
             Bitmap.CompressFormat.WEBP -> ".webp"
         }
-    }
-
-    companion object {
-        fun get(): DefaultNameFactory = DefaultNameFactory()
     }
 }

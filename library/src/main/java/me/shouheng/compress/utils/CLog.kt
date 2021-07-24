@@ -5,15 +5,13 @@ import android.util.Log
 /**
  * Simple log utils
  *
- * @author WngShhng (shouheng2015@gmail.com)
+ * @author Shouheng Wang
  */
 object CLog {
 
     private const val TAG = "Compressor"
 
-    /**
-     * Set the log debug mode
-     */
+    /** Set the log debug mode. */
     var isDebug: Boolean = false
 
     fun d(message: String?) {

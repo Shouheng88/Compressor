@@ -6,7 +6,7 @@ import me.shouheng.compress.strategy.config.ScaleMode.Companion.SCALE_LARGER
 /**
  * The basic configuration for compress strategy.
  *
- * @author WngShhng (shouheng2015@gmail.com)
+ * @author Shouheng Wang
  * @version 2019/3/11 20:34
  */
 object Config {
@@ -17,9 +17,7 @@ object Config {
 
     const val DEFAULT_CACHE_DIRECTORY_NAME = "compressor"
 
-    /**
-     * whether should the bitmap recycled automatically
-     */
+    /** Whether should the bitmap recycled automatically. */
     const val DEFAULT_BITMAP_RECYCLE = true
 
     const val LUBAN_DEFAULT_IGNORE_SIZE = 100 // KB

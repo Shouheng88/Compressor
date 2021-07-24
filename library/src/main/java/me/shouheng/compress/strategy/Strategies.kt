@@ -6,7 +6,7 @@ import me.shouheng.compress.strategy.luban.Luban
 /**
  * The provided strategies.
  *
- * @author WngShhng
+ * @author Shouheng Wang
  */
 object Strategies {
 

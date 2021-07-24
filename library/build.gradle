@@ -54,7 +54,7 @@ publishing {
         mavenJava(MavenPublication) {
             groupId 'com.github.Shouheng88'
             artifactId 'compressor'
-            version '1.3.9'
+            version '1.4.0'
             // Two artifacts, the `aar` and the sources
             artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
             artifact androidSourcesJar

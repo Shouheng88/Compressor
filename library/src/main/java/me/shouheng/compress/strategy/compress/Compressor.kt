@@ -20,7 +20,7 @@ import kotlin.coroutines.CoroutineContext
 /**
  * The compress algorithm by https://github.com/zetbaitsu/Compressor.
  *
- * @author WngShhng
+ * @author Shouheng Wang
  * @version 2019-05-17
  */
 open class Compressor : AbstractStrategy() {
@@ -39,7 +39,7 @@ open class Compressor : AbstractStrategy() {
      * Set the max width of compressed image.
      *
      * @param maxWidth the max width in pixels.
-     * @return         the compressor instance.
+     * @return the compressor instance.
      */
     fun setMaxWidth(maxWidth: Float): Compressor {
         this.maxWidth = maxWidth
@@ -50,7 +50,7 @@ open class Compressor : AbstractStrategy() {
      * Set the max height of compressed image.
      *
      * @param maxHeight the max height in pixels.
-     * @return          the compressor instance.
+     * @return the compressor instance.
      */
     fun setMaxHeight(maxHeight: Float): Compressor {
         this.maxHeight = maxHeight
@@ -60,15 +60,9 @@ open class Compressor : AbstractStrategy() {
     /**
      * Set the scale mode when the destination image ratio differ from the original original.
      *
-     * Might be one of :
-     * 1. [ScaleMode.SCALE_LARGER],
-     * 2. [ScaleMode.SCALE_SMALLER],
-     * 3. [ScaleMode.SCALE_WIDTH]
-     * 4. [ScaleMode.SCALE_HEIGHT].
-     *
      * @param scaleMode the scale mode.
-     * @return          the compressor instance.
-     * @see ScaleMode   for details ab out this field
+     * @return the compressor instance.
+     * @see ScaleMode for details ab out this field
      */
     fun setScaleMode(@ScaleMode scaleMode: Int): Compressor {
         this.scaleMode = scaleMode
@@ -79,7 +73,7 @@ open class Compressor : AbstractStrategy() {
      * Set the image configuration for bitmap: [android.graphics.Bitmap.Config].
      *
      * @param config the config
-     * @return       the compress instance
+     * @return the compress instance
      * @see android.graphics.Bitmap.Config
      */
     fun setConfig(config: Bitmap.Config): Compressor {
@@ -105,13 +99,13 @@ open class Compressor : AbstractStrategy() {
             CLog.e(e.message)
             notifyCompressError(e)
         }
-
         return outFile!!
     }
 
-    override suspend fun get(coroutineContext: CoroutineContext): File = withContext(coroutineContext) {
-        return@withContext get()
-    }
+    override suspend fun get(coroutineContext: CoroutineContext): File =
+        withContext(coroutineContext) {
+            return@withContext get()
+        }
 
     override fun asFlowable(): Flowable<File> {
         return Flowable.defer(Callable {
@@ -214,23 +208,17 @@ open class Compressor : AbstractStrategy() {
         return maxHeight.toInt()
     }
 
-    open fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
-        // Raw height and width of image
-        val height = options.outHeight
-        val width = options.outWidth
+    open fun calculateInSampleSize(reqWidth: Int, reqHeight: Int): Int {
         var inSampleSize = 1
-
-        if (height > reqHeight || width > reqWidth) {
-            val halfHeight = height / 2
-            val halfWidth = width / 2
-
+        if (srcHeight > reqHeight || srcWidth > reqWidth) {
+            val halfHeight = srcHeight / 2
+            val halfWidth = srcWidth / 2
             // Calculate the largest inSampleSize value that is a power of 2 and keeps both
             // height and width larger than the requested height and width.
             while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
                 inSampleSize *= 2
             }
         }
-
         return inSampleSize
     }
 
@@ -270,71 +258,39 @@ open class Compressor : AbstractStrategy() {
         val reqWidth = calculateRequiredWidth(imgRatio, reqRatio)
         val reqHeight = calculateRequiredHeight(imgRatio, reqRatio)
 
-        val originBitmap = getOriginBitmap(reqWidth, reqHeight)
+        val origin = getOriginBitmap(reqWidth, reqHeight)
 
         // ignore if the origin size is smaller then required size
         if (ignoreIfSmaller && (reqWidth > srcWidth || reqWidth > srcHeight)) {
-            return originBitmap?.let { rotateBitmapIfNecessary(it) }
+            return origin?.let {
+                imageSource?.rotation(it)
+            }
         }
 
-        // failed to create scaled bitmap or get the origin bitmap, return null directly
-        if (originBitmap == null) return null
+        // failed to create scaled bitmap or get the origin bitmap, return null directly.
+        if (origin == null) return null
 
         // scale the bitmap
-        val ratioX = reqWidth / originBitmap.width.toFloat()
-        val ratioY = reqHeight / originBitmap.height.toFloat()
-        val scaleMatrix = Matrix().apply { setScale(ratioX, ratioY) }
-        val scaledBitmap = Bitmap.createBitmap(originBitmap, 0, 0, originBitmap.width, originBitmap.height, scaleMatrix, true)
+        val ratioX = reqWidth / origin.width.toFloat()
+        val ratioY = reqHeight / origin.height.toFloat()
+        val matrix = Matrix().apply { setScale(ratioX, ratioY) }
+        val result = Bitmap.createBitmap(origin, 0, 0, origin.width, origin.height, matrix, true)
 
-        // recycle the source bitmap automatically when:
-        // 1. the source bitmap is null, the bmp is derived from srdData and srcFile
-        // 2. the autoRecycle is true
-        if (srcBitmap == null || autoRecycle) originBitmap.recycle()
-
-        return rotateBitmapIfNecessary(scaledBitmap)
+        return imageSource?.rotation(result)
     }
 
     /** Get the origin bitmap based on the source bitmap type. */
     private fun getOriginBitmap(reqWidth: Int, reqHeight: Int): Bitmap? {
-        var originBitmap = srcBitmap
-
-        if (srcData != null || srcFile != null) {
-            val options = BitmapFactory.Options()
-            options.inJustDecodeBounds = true
-            options.inSampleSize = 1
-
-            if (srcData != null) {
-                BitmapFactory.decodeByteArray(srcData, 0, srcData!!.size, options)
-            } else {
-                BitmapFactory.decodeFile(srcFile!!.absolutePath, options)
-            }
-
-            options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight)
-            options.inJustDecodeBounds = false
-            options.inDither = false
-            options.inPurgeable = true
-            options.inInputShareable = true
-            options.inTempStorage = ByteArray(16 * 1024)
-
-            originBitmap = if (srcData != null) {
-                BitmapFactory.decodeByteArray(srcData, 0, srcData!!.size, options)
-            } else {
-                BitmapFactory.decodeFile(srcFile!!.absolutePath, options)
-            }
-        }
-
-        return originBitmap
+        val sourceData = imageSource!!.source()
+        if (sourceData.isBitmap())
+            return sourceData.data() as Bitmap
+        val options = BitmapFactory.Options()
+        options.inSampleSize = calculateInSampleSize(reqWidth, reqHeight)
+        options.inJustDecodeBounds = false
+        options.inDither = false
+        options.inPurgeable = true
+        options.inInputShareable = true
+        options.inTempStorage = ByteArray(16 * 1024)
+        return imageSource!!.bitmap(options).bitmap
     }
-
-    /** Try to rotate bitmap based on the source file orientation. */
-    private fun rotateBitmapIfNecessary(origin: Bitmap): Bitmap {
-        if (srcFile != null) {
-            val orientation = CImageUtils.getImageAngle(srcFile!!)
-            if (orientation != 0) {
-                return CImageUtils.rotateBitmap(origin, orientation)
-            }
-        }
-        return origin
-    }
-
 }
