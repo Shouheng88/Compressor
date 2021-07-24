@@ -16,7 +16,7 @@ import kotlin.coroutines.CoroutineContext
 
 /**
  * Simple image compress logic, change the sample size only. Implement the
- * [.calInSampleSize] method to add your own sample logic.
+ * [calInSampleSize] method to add your own sample logic.
  *
  * @author WngShnng
  */
@@ -36,9 +36,10 @@ abstract class SimpleStrategy : AbstractStrategy() {
         return outFile!!
     }
 
-    override suspend fun get(coroutineContext: CoroutineContext): File = withContext(coroutineContext) {
-        return@withContext get()
-    }
+    override suspend fun get(coroutineContext: CoroutineContext): File =
+        withContext(coroutineContext) {
+            return@withContext get()
+        }
 
     override fun asFlowable(): Flowable<File> {
         return Flowable.defer(Callable {

@@ -20,7 +20,7 @@ import kotlin.coroutines.CoroutineContext
 /**
  * The compress algorithm by https://github.com/zetbaitsu/Compressor.
  *
- * @author WngShhng
+ * @author Shouheng Wang
  * @version 2019-05-17
  */
 open class Compressor : AbstractStrategy() {
@@ -39,7 +39,7 @@ open class Compressor : AbstractStrategy() {
      * Set the max width of compressed image.
      *
      * @param maxWidth the max width in pixels.
-     * @return         the compressor instance.
+     * @return the compressor instance.
      */
     fun setMaxWidth(maxWidth: Float): Compressor {
         this.maxWidth = maxWidth
@@ -50,7 +50,7 @@ open class Compressor : AbstractStrategy() {
      * Set the max height of compressed image.
      *
      * @param maxHeight the max height in pixels.
-     * @return          the compressor instance.
+     * @return the compressor instance.
      */
     fun setMaxHeight(maxHeight: Float): Compressor {
         this.maxHeight = maxHeight
@@ -60,15 +60,9 @@ open class Compressor : AbstractStrategy() {
     /**
      * Set the scale mode when the destination image ratio differ from the original original.
      *
-     * Might be one of :
-     * 1. [ScaleMode.SCALE_LARGER],
-     * 2. [ScaleMode.SCALE_SMALLER],
-     * 3. [ScaleMode.SCALE_WIDTH]
-     * 4. [ScaleMode.SCALE_HEIGHT].
-     *
      * @param scaleMode the scale mode.
-     * @return          the compressor instance.
-     * @see ScaleMode   for details ab out this field
+     * @return the compressor instance.
+     * @see ScaleMode for details ab out this field
      */
     fun setScaleMode(@ScaleMode scaleMode: Int): Compressor {
         this.scaleMode = scaleMode
@@ -79,7 +73,7 @@ open class Compressor : AbstractStrategy() {
      * Set the image configuration for bitmap: [android.graphics.Bitmap.Config].
      *
      * @param config the config
-     * @return       the compress instance
+     * @return the compress instance
      * @see android.graphics.Bitmap.Config
      */
     fun setConfig(config: Bitmap.Config): Compressor {

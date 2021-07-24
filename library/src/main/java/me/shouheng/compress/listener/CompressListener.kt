@@ -8,6 +8,6 @@ import java.io.File
  * The compress state callback. This callback is used to listen to the file
  * type result. Mainly used to
  *
- * @author WngShhng (shouheng2015@gmail.com)
+ * @author Shouheng Wang
  */
 interface CompressListener : RequestBuilder.Callback<File>

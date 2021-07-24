@@ -22,7 +22,7 @@ import java.io.ByteArrayOutputStream
 /**
  * Sample strategy activity
  *
- * @author WngShhng (shouheng2015@gmail.com)
+ * @author Shouheng Wang
  * @version 2019/5/17 22:04
  */
 @ActivityConfiguration(layoutResId = R.layout.activity_sample)

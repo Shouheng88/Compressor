@@ -9,7 +9,7 @@ import me.shouheng.compress.strategy.config.ScaleMode.Companion.SCALE_WIDTH
 /**
  * Image scale mode enums.
  *
- * @author WngShhng (shouheng2015@gmail.com)
+ * @author Shouheng Wang
  * @version 2019/5/17 0:03
  */
 @IntDef(SCALE_LARGER, SCALE_SMALLER, SCALE_WIDTH, SCALE_HEIGHT)

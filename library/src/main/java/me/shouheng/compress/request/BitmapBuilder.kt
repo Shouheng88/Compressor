@@ -29,9 +29,10 @@ class BitmapBuilder : RequestBuilder<Bitmap>() {
         return bitmap
     }
 
-    override suspend fun get(coroutineContext: CoroutineContext): Bitmap? = withContext(coroutineContext) {
-        return@withContext get()
-    }
+    override suspend fun get(coroutineContext: CoroutineContext): Bitmap? =
+        withContext(coroutineContext) {
+            return@withContext get()
+        }
 
     override fun asFlowable(): Flowable<Bitmap> {
         return Flowable.defer(Callable {

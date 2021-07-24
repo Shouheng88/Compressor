@@ -8,6 +8,10 @@ import me.shouheng.compress.listener.CompressListener
 import me.shouheng.compress.naming.CacheNameFactory
 import me.shouheng.compress.naming.DefaultNameFactory
 import me.shouheng.compress.strategy.config.Config
+import me.shouheng.compress.suorce.BitmapImageSource
+import me.shouheng.compress.suorce.ByteArrayImageSource
+import me.shouheng.compress.suorce.FileImageSource
+import me.shouheng.compress.suorce.ImageSource
 import me.shouheng.compress.utils.CFileUtils
 import me.shouheng.compress.utils.CLog
 
@@ -16,14 +20,12 @@ import java.io.File
 /**
  * The Compress connector.
  *
- * @author WngShhng (shouheng2015@gmail.com)
+ * @author Shouheng Wang
  * @version 2019-5-22
  */
 class Compress private constructor(
     private val context: Context,
-    private val srcFile: File?,
-    private val srcBitmap: Bitmap?,
-    private val srcData: ByteArray?
+    private val imageSource: ImageSource<Any>
 ) {
     private var format: Bitmap.CompressFormat = Config.DEFAULT_COMPRESS_FORMAT
     private var quality: Int = Config.DEFAULT_COMPRESS_QUALITY
@@ -39,28 +41,18 @@ class Compress private constructor(
                     ?: throw IllegalStateException("Cache directory is null, check your storage permission and try again.")
                 targetDir = cacheDir.absolutePath
             }
-            val pathname = targetDir + File.separator + getCacheNameFactory().getFileName(format)
+            val pathname = targetDir + File.separator + (cacheNameFactory?:DefaultNameFactory).getFileName(format)
             CLog.d("The output file name was $pathname.")
             return File(pathname)
         }
 
-    /**
-     * Set the format of compressed image.
-     *
-     * @param format image format
-     * @return       the compress instance
-     */
+    /** Set the format of compressed image. */
     fun setFormat(format: Bitmap.CompressFormat): Compress {
         this.format = format
         return this
     }
 
-    /**
-     * Set the quality of compressed image, should be an integer between 0 and 100, aks [0, 100].
-     *
-     * @param quality the quality of compressed image
-     * @return        the compress instance
-     */
+    /** Set the quality of compressed image. */
     fun setQuality(@IntRange(from = 0, to = 100) quality: Int): Compress {
         this.quality = quality
         return this
@@ -80,34 +72,19 @@ class Compress private constructor(
         return this
     }
 
-    /**
-     * The directory compressed image will be saved to.
-     *
-     * @param targetDir the target directory
-     * @return          the compress instance
-     */
+    /** Directory the compressed image will be saved to. */
     fun setTargetDir(targetDir: String): Compress {
         this.targetDir = targetDir
         return this
     }
 
-    /**
-     * The factory witch will used to provide the name of compressed file.
-     *
-     * @param cacheNameFactory the cache name factory
-     * @return                 the compress instance
-     */
+    /** The factory witch will used to provide the name of compressed file. */
     fun setCacheNameFactory(cacheNameFactory: CacheNameFactory): Compress {
         this.cacheNameFactory = cacheNameFactory
         return this
     }
 
-    /**
-     * Set the compress listener, you can get the compressed image and the progress.
-     *
-     * @param compressListener the listener
-     * @return                 the compress instance
-     */
+    /** Set the compress listener, you can get the compressed image and the progress. */
     fun setCompressListener(compressListener: CompressListener): Compress {
         this.compressListener = compressListener
         return this
@@ -117,62 +94,36 @@ class Compress private constructor(
      * Set the strategy used to compress the image. This method is often the last one for basic
      * options, other options are provided by each strategy.
      *
-     * @param t   the strategy instance, use [me.shouheng.compress.strategy.Strategies]
-     *            to get all provided strategies.
-     * @param <T> the strategy type.
-     * @return    the strategy instance.
-     *
+     * @param strategy the strategy instance, use [me.shouheng.compress.strategy.Strategies].
      * @see AbstractStrategy
      */
-    fun <T : AbstractStrategy> strategy(t: T): T {
-        t.setSrcFile(srcFile)
-        t.setSrcBitmap(srcBitmap)
-        t.setSrcData(srcData)
-        t.setFormat(format)
-        t.setQuality(quality)
-        t.setAutoRecycle(autoRecycle)
-        t.setOutFile(outFile)
-        t.setCompressListener(compressListener)
-        return t
-    }
-
-    private fun getCacheNameFactory(): CacheNameFactory {
-        return cacheNameFactory?:DefaultNameFactory.get()
+    fun <T : AbstractStrategy> strategy(strategy: T): T {
+        return strategy.apply {
+            setImageSource(imageSource)
+            setSrcData(srcData)
+            setFormat(format)
+            setQuality(quality)
+            setAutoRecycle(autoRecycle)
+            setOutFile(outFile)
+            setCompressListener(compressListener)
+        }
     }
 
     companion object {
 
-        /**
-         * Get a compress instance with image source type [File]
-         *
-         * @param context context
-         * @param file    image source
-         * @return        the compress instance
-         */
+        /** Get a compress instance with image source type [File]. */
         fun with(context: Context, file: File): Compress {
-            return Compress(context, file, null, null)
+            return Compress(context, FileImageSource(file), null, null)
         }
 
-        /**
-         * Get a compress instance with image source type [Bitmap]
-         *
-         * @param context   context
-         * @param srcBitmap image source
-         * @return          the compress instance
-         */
+        /** Get a compress instance with image source type [Bitmap]. */
         fun with(context: Context, srcBitmap: Bitmap): Compress {
-            return Compress(context, null, srcBitmap, null)
+            return Compress(context, null, BitmapImageSource(srcBitmap), null)
         }
 
-        /**
-         * Get a compress instance with image source type of [ByteArray]
-         *
-         * @param context context
-         * @param srcData image source
-         * @return        the compress instance
-         */
+        /** Get a compress instance with image source type of [ByteArray]. */
         fun with(context: Context, srcData: ByteArray): Compress {
-            return Compress(context, null, null, srcData)
+            return Compress(context, null, null, ByteArrayImageSource(srcData))
         }
     }
 }

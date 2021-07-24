@@ -16,9 +16,9 @@ object CFileUtils {
     /**
      * Get the default cache directory.
      *
-     * @param context   the context to get cache directory.
+     * @param context the context to get cache directory.
      * @param cacheName cache directory name.
-     * @return          the cache directory file.
+     * @return the cache directory file.
      */
     fun getDefaultCacheDir(context: Context, cacheName: String): File? {
         if (!isStorageWritable) {
@@ -41,9 +41,9 @@ object CFileUtils {
     /**
      * Copy file from source to destination.
      *
-     * @param source      the source file.
+     * @param source the source file.
      * @param destination the destination to copy to.
-     * @return            is copy succeed.
+     * @return is copy succeed.
      */
     fun copyFile(source: File, destination: File): Boolean {
         return try {
@@ -58,8 +58,8 @@ object CFileUtils {
      * Copy from the original to destination, based on the input and output stream.
      *
      * @param ins the input stream.
-     * @param os  the output stream.
-     * @return    is copy succeed.
+     * @param os the output stream.
+     * @return is copy succeed.
      */
     fun copyFile(ins: InputStream, os: OutputStream): Boolean {
         var res = false

@@ -13,19 +13,15 @@ import kotlin.math.ceil
 /**
  * The compress algorithm by [Luban](https://github.com/Curzibn/Luban).
  *
- * @author WngShhng
+ * @author Shouheng Wang
  * @version 2019-05-17
  */
 class Luban : SimpleStrategy() {
 
-    /**
-     * The image won't be compressed if the image size smaller than this value (KB).
-     */
+    /** The image won't be compressed if the image size smaller than this value (KB). */
     private var ignoreSize: Int = Config.LUBAN_DEFAULT_IGNORE_SIZE // KB
 
-    /**
-     * Should copy the image if the size of original image is less than [ignoreSize].
-     */
+    /** Should copy the image if the size of original image is less than [ignoreSize]. */
     private var copyWhenIgnore: Boolean = Config.LUBAN_COPY_WHEN_IGNORE
 
     /**
@@ -35,7 +31,7 @@ class Luban : SimpleStrategy() {
      * Otherwise the original file will be copied to the destination.
      *
      * @param ignoreSize the size to ignore.
-     * @return           luban instance
+     * @return luban instance
      */
     fun setIgnoreSize(ignoreSize: Int, copyWhenIgnore: Boolean): Luban {
         this.ignoreSize = ignoreSize
