@@ -1,3 +1,8 @@
+- V1.4.0
+
+  - [RFCT] image source logic
+  - [RFCT] add kotlin DSL support
+
 - Version 1.3.1:
 
 	- Do image quality compress when return Bitmap

@@ -30,15 +30,15 @@
 
 ## 1 Introduction
 
-This project is mainly designed based on the Android image compress API. It provided two image compress implementions based on algorithms of open souce libraries  [Luban](https://github.com/Curzibn/Luban) and [Compressor](https://github.com/zetbaitsu/Compressor) and introduced interfaces for different types of image sources and results. It provided sync and async API to meet more requirements. And it put forward the struture so that you can easily switch from different compress algorithms.
+This project is mainly designed based on the Android image compress API. It allow to use  different types of image sources and result types. It provided sync and async API to meet more requirements. And it put forward the struture so that you can easily switch from different compress algorithms.
 
 ## 2 Functions and features
 
 Now lets show you the functions and features of our library:
 
-- **Support Luban Algorithm**: As mentationed, it provided an algorithm based on WeChat.
+- **Support automatic algorithm**: Calculate the in sample size according to image size, see [Luban](https://github.com/Curzibn/Luban).
 
-- **Support Compressor Algoruthm**: Differenct from Luban, you are able to get an exact image size.
+- **Support aoncrete algoruthm**: You are able to get an exact image size, see [Compressor](https://github.com/zetbaitsu/Compressor).
 
 - **Support RxJava callback**: We will return a Flowable object so you can use it as RxJava.
 
@@ -80,6 +80,8 @@ implementation 'com.github.Shouheng88:compressor:latest-version'
 
 ### 3.2 Use our library
 
+**1. Get compress object**
+
 First, you should use the static methods of Compress to get a an instance of it, which is the magic begins. It has three different factory methods correspond to three different type of image sources:
 
 ```kotlin
@@ -117,26 +119,51 @@ compress
     })
 ```
 
-Then we need to specify compress strategy (algorithm). Take Compressor strategy as an example, we could use `Strategies.compressor()` to get instance of this strategy. And config details about this strategy by `setMaxHeight`, `setMaxWidth` etc. Different algorithm might have different configurations. For details, you can refer to the comment of methods. Also, for keypoints, your can refer to 3.3 of this README.
+**2. Specify algorithm**
+
+Then we need to specify compress strategy (algorithm). Take Compressor strategy as an example, we could use `Strategies.compressor()` to get instance of it. And set details of it by calling `setMaxHeight`, `setMaxWidth` etc. Different algorithm might have different configurations.
 
 ```kotlin
 val compressor = compress
-    // Specify strategy
-    .strategy(Strategies.compressor())
-    // Set desired output width and height
-    .setMaxHeight(100f)
+    .strategy(Strategies.compressor()) // Specify strategy
+    .setMaxHeight(100f) // Set desired output width and height
     .setMaxWidth(100f)
-    // Set desiged output scale mode
-    .setScaleMode(scaleMode)
+    .setScaleMode(scaleMode) // Set desiged output scale mode
 ```
 
-Next, as mentioned above, if you want to get compressed image of Bitmap. You should use `asBitmap()` of `compressor`. Otherwise, the compressed result will be File type.
+On 1.4.0 and above, you can use the kotlin DSL to specify algorithm,
+
+```kotlin
+compress
+    .setQuality(60)
+    .setTargetDir(PathUtils.getExternalPicturesPath())
+    .setCompressListener(getCompressListener("Concrete", compressorResultType))
+    .concrete {
+        this.config = colorConfig
+        this.maxWidth = 100f
+        this.maxHeight = 100f
+        this.scaleMode = imageScaleMode
+    }
+// --- or ---
+Compress.with(context, byteArray)
+    .automatic {
+        // do nothing
+    }
+    .asBitmap()
+    .get()
+```
+
+**3. Change result type**
+
+Next, as mentioned above, if you want to get compressed image of Bitmap, you should use `asBitmap()`. Otherwise, the compressed result will be File type,
 
 ```kotlin
 compressor = compressor.asBitmap()
 ```
 
-To finally get the result you have 4 options correspond to 4 different ways async/sync api:
+**4. Invoke the compress**
+
+To finally get the result you have 4 options correspond to 4 different ways async/sync apis:
 
 ```kotlin
 // Option 1: use AsyncTask to execute async task and to get result from callback
@@ -147,7 +174,7 @@ val d = compressor
     .asFlowable()
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
-    .subscribe({ /* on succeed */ }, { /* on error */ })
+    .subscribe( ... )
 
 // Option 3: use sync and blocking API to get result in current thread
 val resultFile = compressor.get()
@@ -157,6 +184,8 @@ GlobalScope.launch {
     val resultFile = compressor.get(Dispatchers.IO)
 }
 ```
+
+**5. Complete code**
 
 If you want to use another strategy, you can simply use `Strategies.luban()` instead of `Strategies.compressor()`. Excpet these two strategies, you can also make a custom strategy.
 
@@ -173,12 +202,7 @@ val compressor = Compress.with(this@MainActivity, file)
     .asFlowable()
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
-    .subscribe({
-        ToastUtils.showShort("Success [Compressor,Bitmap,Flowable] $it")
-        displayResult(it)
-    }, {
-        ToastUtils.showShort("Error [Compressor,Bitmap,Flowable] : $it")
-    })
+    .subscribe( ... )
 ```
 
 ### 3.3 Detail configurations about compressor
@@ -201,35 +225,16 @@ The scale mode is used to specify image stretching ways while current image size
 
 ## 3 More
 
-### 3.1 About project
-
-We are glad if you could contribute to this project. Here, we provied more about our project to help you:
+I'm glad if you could contribute to this project. Here, we provied more about our project to help you:
 
 1. Library structure: [https://www.processon.com/view/link/5cdfb769e4b00528648784b7](https://www.processon.com/view/link/5cdfb769e4b00528648784b7)
-2. Android compress APIs and this library introduction: [《开源一个 Android 图片压缩框架》](https://juejin.im/post/5c87d01f6fb9a049b7813784)
-3. Sample APK: [app-debug.apk](resources/app-debug.apk)
-4. [Release Log](CHANGELOG.md)
-
-### 3.2 About Author
-
-Visit the links below to get more information about author:
-
-1. Twitter: https://twitter.com/shouheng_wang
-2. Github: https://github.com/Shouheng88
-3. Juejin：https://juejin.im/user/585555e11b69e6006c907a2a
-4. JianShu: https://www.jianshu.com/u/e1ad842673e2
-
-## Donate
-
-<div style="display:flex;" id="target">
-<img src="https://github.com/CostCost/Resources/blob/master/github/ali.jpg?raw=true" width="25%" />
-<img src="https://github.com/CostCost/Resources/blob/master/github/mm.png?raw=true" style="margin-left:10px;" width="25%"/>
-</div>
+2. Sample APK: [app-debug.apk](resources/app-debug.apk)
+3. [Release Log](CHANGELOG.md)
 
 ## License
 
 ```
-Copyright (c) 2019-2020 CodeBrick.
+Copyright (c) 2019-2021 Shouheng Wang.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

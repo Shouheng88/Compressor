@@ -1,5 +1,5 @@
 <h1 align="center">
-    一款现代、高效的 Android 图片压缩框架
+    一款易用的 Android 图片压缩框架
 </h1>
 
 <p align="center">
@@ -27,15 +27,15 @@
 
 ## 1、简介
 
-本项目主要基于 Android 自带的图片压缩 API 进行实现，提供了开源压缩方案 [Luban](https://github.com/Curzibn/Luban) 和 [Compressor](https://github.com/zetbaitsu/Compressor) 的实现，解决了单一 Fie 类型数据源的问题，并在它们的基础之上进行了功能上的拓展。该项目的主要目的在于：提供一个统一图片压缩框库的实现，集成常用的两种图片压缩算法，让你以更低的成本集成图片压缩功能到自己的项目中。
+本项目主要基于 Android 自带的图片压缩 API 进行实现，支持多种输入和输出类型，提供一个统一图片压缩框库的实现，支持自定义图片压缩算法，支持多种触发任务方式。
 
 ## 2、功能和特性
 
 目前，我们的库已经支持了下面的功能，在后面的介绍中，我们会介绍如何在项目中进行详细配置和使用：
 
-- **支持 Luban 压缩方案**：据介绍这是微信逆推的压缩算法，它在我们的项目中只作为一种可选的压缩方案，除此之外您还可以使用 Compressor 进行压缩，以及自定义压缩策略。
+- **支持 Automatic 压缩方案**：据介绍这是微信逆推的压缩算法，它在我们的项目中只作为一种可选的压缩方案。（参考：[Luban](https://github.com/Curzibn/Luban)）
 
-- **支持 Compressor 压缩方案**：这种压缩方案综合了 Android 自带的三种压缩方式，可以对压缩结果的尺寸进行精确的控制。此外，在我们的项目中，我们对这种压缩方案的功能进行了拓展，不仅支持了颜色通道的选择，还提供了多种可选的策略，用来对尺寸进行更详细的配置。
+- **支持 Concrete 压缩方案**：这种压缩方案综合了 Android 自带的三种压缩方式，可以对压缩结果的尺寸进行精确的控制。此外，在我们的项目中，我们对这种压缩方案的功能进行了拓展，不仅支持了颜色通道的选择，还提供了多种可选的策略，用来对尺寸进行更详细的配置。（参考：[Compressor](https://github.com/zetbaitsu/Compressor)）
 - **支持 RxJava 的方式进行压缩**：使用 RxJava 的方式，您可以任意指定压缩任务和结果回调任务所在的线程，在我们的库中，我们提供了一个 Flowable 类型的对象，您可以用它来进行后续的处理。
 - **支持 AsyncTask + 回调的压缩方式**：这种方式通过使用 AsyncTask 在后台线程中执行压缩任务，当获取到压缩结果的时候通过 Handler 在主线程中返回压缩结果。
 - **支持 Kotlin 协程**：在 1.3.5 的版本上引入了 Kotlin 协程，你可以在这个版本上面使用 Kotlin 协程进行压缩并获取结果。
@@ -67,6 +67,8 @@ implementation 'com.github.Shouheng88:compressor:latest-version'
 ### 3.2 使用我们库进行压缩
 
 详细的用法你可以参考我们提供的 Sample 程序，这里我们介绍下使用我们库的几个要点：
+
+**1. 获取 Compress 实例**
 
 首先，你要使用 Compress 类的静态方法获取一个 `compress` 实例，这是所有配置的起点。针对不同的数据源，你可以根据自己的需求调用其对应的工厂方法。
 
@@ -107,7 +109,9 @@ compress
 
 以上是使用 Compress 进行基本的配置。Compress 的基本配置是通用的，你可以切换图片算法而无需更改这些配置。这也是我们的库可以轻松切换图片算法的原因。
 
-根据上述配置，我们就得到了一个 Compress 对象。然后，我们需要指定一个图片压缩策略，并调用压缩策略的方法进行更详细的配置。以 Compressor 为例，我们可以通过调用 `Strategies.compressor()` 方法获取它的实例并指定 Compressor 算法的配置：
+**2. 指定压缩算法**
+
+根据上述配置，我们就得到了一个 Compress 对象。然后，我们需要指定一个图片压缩算法，并调用压缩算法的方法进行更详细的配置。以 concrete 为例，我们可以通过调用 `Strategies.compressor()` 方法获取它的实例并指定 Compressor 算法的配置：
 
 ```kotlin
 val compressor = compress
@@ -118,15 +122,30 @@ val compressor = compress
     .setScaleMode(scaleMode)
 ```
 
+如果你试用 1.4.0 及以后的版本可以使用 Kotlin DSL 的形式定义自己的算法，
+
+```kotlin
+compress
+  .concrete {
+      maxHeight = 100f
+      maxWidth = 120f
+      scaleMode = ScaleMode.SCALE_LARGER
+  }
+```
+
 下面就是触发图片压缩并获取压缩结果的过程了。
 
-上面我们也提到过，针对 File 类型和 Bitmap 类型的返回结果，我们提供了两个方案。默认的返回类型是 File，为了得到 Bitmap 类型的结果，你只需要调用一下 Compressor 实例的 `asBitmap()` 方法，这样整个流程就‘拐’到了 Bitmap 的构建中去了（就像 Glide 一样）。
+**3. 转换输出类型**
+
+上面我们也提到过，针对 File 类型和 Bitmap 类型的返回结果，我们提供了两个方案。默认的返回类型是 File，为了得到 Bitmap 类型的结果，你只需要调用一下 `asBitmap()` 方法，这样整个流程就“转换”到了 Bitmap 的构建中去了（就像 Glide 一样）。
 
 ```kotlin
 compressor = compressor.asBitmap()
 ```
 
-最终触发图片压缩有 4 种方式，
+**4. 在多种环境下触发任务**
+
+最终触发图片压缩有 4 种选择，
 
 ```kotlin
 // 方式 1：使用 AsyncTask 压缩，此时只能通过之前的回调获取压缩结果
@@ -155,28 +174,29 @@ GlobalScope.launch {
 
 对于 Luban 压缩方式的使用与之类似，只需要在指定压缩策略的那一步中将策略替换成 luban 即可。另外，对于自定义图片压缩的方式也是类似的，只需要在指定策略的那一步骤中指定即可。
 
+**5. 最终的完整形式**
+
 因此，如果使用的是 RxJava 的方式获取压缩结果，并且输入类型是 File，输出类型是 Bitmap，整个压缩的流程将是下面这样：
 
 ```kotlin
-val compressor = Compress.with(this@MainActivity, file)
-    .strategy(Strategies.compressor())
-    .setConfig(config)
-    .setMaxHeight(100f)
-    .setMaxWidth(100f)
-    .setScaleMode(scaleMode)
-    .asBitmap()
-    .asFlowable()
+Compress.with(context, file)
+    .setQuality(60)
+    .setTargetDir(PathUtils.getExternalPicturesPath())
+    .setCompressListener(getCompressListener("Concrete", compressorResultType))
+    .concrete { // 对 Concrete 算法进行定制
+        this.config = colorConfig
+        this.maxWidth = 100f
+        this.maxHeight = 100f
+        this.scaleMode = imageScaleMode
+    }
+    .asBitmap() // 期望得到 Bitmap 类型的结果
+    .asFlowable() // 转换为 Flowable，然后就可以使用 RxJava 了
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
-    .subscribe({
-        ToastUtils.showShort("Success [Compressor,Bitmap,Flowable] $it")
-        displayResult(it)
-    }, {
-        ToastUtils.showShort("Error [Compressor,Bitmap,Flowable] : $it")
-    })
+    .subscribe( ... )
 ```
 
-### 3.3 Compressor 算法配置说明
+### 3.3 Concrete 算法配置说明
 
 **1. ignoreIfSmaller**
 
@@ -194,32 +214,12 @@ val compressor = Compress.with(this@MainActivity, file)
 如果您对该项目感兴趣并且希望为该项目共享您的代码，那么您可以通过下面的一些资料来了解相关的内容：
 
 1. 项目整体的架构设计：[https://www.processon.com/view/link/5cdfb769e4b00528648784b7](https://www.processon.com/view/link/5cdfb769e4b00528648784b7)
-2. Android 图片压缩 API 的介绍，该项目的简介等：[《开源一个 Android 图片压缩框架》](https://juejin.im/post/5c87d01f6fb9a049b7813784)
-3. 我们提供的示例 APK：[app-debug.apk](resources/app-debug.apk)
-4. [更新日志](CHANGELOG.md)
-
-## 关于作者
-
-你可以通过访问下面的链接来获取作者的信息：
-
-1. Twitter: https://twitter.com/shouheng_wang
-2. Github: https://github.com/Shouheng88
-3. 掘金：https://juejin.im/user/585555e11b69e6006c907a2a
-4. 简书: https://www.jianshu.com/u/e1ad842673e2
-
-## 捐赠项目
-
-你可以通过下面的渠道来支持我们的项目，
-
-<div style="display:flex;" id="target">
-<img src="https://github.com/CostCost/Resources/blob/master/github/ali.jpg?raw=true" width="25%" />
-<img src="https://github.com/CostCost/Resources/blob/master/github/mm.png?raw=true" style="margin-left:10px;" width="25%"/>
-</div>
-
+2. 我们提供的示例 APK：[app-debug.apk](resources/app-debug.apk)
+3. [更新日志](CHANGELOG.md)
 ## License
 
 ```
-Copyright (c) 2019-2020 CodeBrick.
+Copyright (c) 2019-2021 Shouheng Wang.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
