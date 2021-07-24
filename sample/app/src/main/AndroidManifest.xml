@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-    <uses-sdk tools:overrideLibrary="me.shouheng.mvvm,me.shouheng.uix"/>
+    <uses-sdk tools:overrideLibrary="me.shouheng.vmlib,me.shouheng.uix,me.shouheng.uix.pages,me.shouheng.uix.widget,me.shouheng.uix.common,me.shouheng.vmlib.network"/>
 
     <application
         android:allowBackup="true"

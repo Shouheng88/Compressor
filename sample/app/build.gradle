@@ -51,8 +51,8 @@ dependencies {
 
     implementation "com.github.Shouheng88:vmlib-network:$androidVMLibVersion"
     implementation ("com.github.Shouheng88:vmlib:$androidVMLibVersion") {
-        exclude group: 'me.shouheng.utils'
-        exclude group: 'me.shouheng.compressor'
+        exclude group: 'com.github.Shouheng88', module: "compressor"
+        exclude group: 'com.github.Shouheng88', module: "utils-core"
     }
     implementation ("com.github.Shouheng88:uix-core:$androidUIXVersion") {
         exclude group: 'com.github.Shouheng88', module: "matisse"

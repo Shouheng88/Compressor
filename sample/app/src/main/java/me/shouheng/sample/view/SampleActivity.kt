@@ -1,19 +1,23 @@
 package me.shouheng.sample.view
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
+import automatic
+import concrete
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import me.shouheng.compress.Compress
-import me.shouheng.compress.strategy.Strategies
 import me.shouheng.compress.strategy.config.ScaleMode
 import me.shouheng.sample.R
 import me.shouheng.sample.databinding.ActivitySampleBinding
+import me.shouheng.utils.constant.ActivityDirection
+import me.shouheng.utils.ktx.dp
 import me.shouheng.utils.ui.ImageUtils
-import me.shouheng.utils.ui.ViewUtils
+import me.shouheng.vmlib.anno.ActivityConfiguration
 import me.shouheng.vmlib.base.CommonActivity
 import me.shouheng.vmlib.comn.EmptyViewModel
 import java.io.ByteArrayOutputStream
@@ -24,44 +28,54 @@ import java.io.ByteArrayOutputStream
  * @author Shouheng Wang
  * @version 2019/5/17 22:04
  */
+@ActivityConfiguration(exitDirection = ActivityDirection.ANIMATE_SLIDE_BOTTOM_FROM_TOP)
 class SampleActivity : CommonActivity<EmptyViewModel, ActivitySampleBinding>() {
 
     override fun getLayoutResId(): Int = R.layout.activity_sample
 
     override fun doCreateView(savedInstanceState: Bundle?) {
-        val d = Observable.create<Bitmap> {
-            val bitmap = Compress.with(this, BitmapFactory.decodeResource(resources,
-                R.drawable.img_lena
-            ))
-                .strategy(Strategies.compressor())
-                .setMaxHeight(100f)
-                .setMaxHeight(120f)
-                .setScaleMode(ScaleMode.SCALE_LARGER)
+        compressOnCurrentThread()
+        compress()
+    }
+
+    /** The sample of do image compress on current thread (blocking). */
+    @SuppressLint("CheckResult")
+    private fun compressOnCurrentThread() {
+        Observable.create<Bitmap> {
+            val srcBitmap = BitmapFactory.decodeResource(resources, R.drawable.img_lena)
+            // Compress and try to get the result on current thread.
+            val bitmap = Compress.with(context, srcBitmap)
+                .concrete {
+                    maxHeight = 100f
+                    maxWidth = 120f
+                    scaleMode = ScaleMode.SCALE_LARGER
+                }
                 .asBitmap()
                 .get()
-            val result = ImageUtils.addCircleBorder(bitmap, ViewUtils.dp2px(1f), Color.RED)
+            // Add some color ... don't mind, none of business with compress ;)
+            val result = ImageUtils.addCircleBorder(bitmap, 1f.dp(), Color.RED)
             it.onNext(result)
         }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
             binding.iv2.setImageBitmap(it)
         }, {
             toast("error : $it")
         })
-        val d2 = Observable.create<Bitmap> {
-            var bitmap = BitmapFactory.decodeResource(resources,
-                R.drawable.img_lena
-            )
+    }
+
+    @SuppressLint("CheckResult")
+    private fun compress() {
+        Observable.create<Bitmap> {
+            var srcBitmap = BitmapFactory.decodeResource(resources, R.drawable.img_lena)
             val out = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            srcBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
             val byteArray = out.toByteArray()
-            bitmap = Compress.with(this@SampleActivity, byteArray)
-                .strategy(Strategies.compressor())
-                .setMaxHeight(50f)
-                .setMaxHeight(60f)
-                .setScaleMode(ScaleMode.SCALE_LARGER)
+            srcBitmap = Compress.with(context, byteArray)
+                .automatic {
+                    // do nothing
+                }
                 .asBitmap()
                 .get()
-            val result = ImageUtils.addCornerBorder(bitmap, ViewUtils.dp2px(1f),
-                Color.GREEN, ViewUtils.dp2px(20f).toFloat())
+            val result = ImageUtils.addCornerBorder(srcBitmap, 1f.dp(), Color.GREEN, 20f.dp().toFloat())
             it.onNext(result)
         }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
             binding.iv3.setImageBitmap(it)

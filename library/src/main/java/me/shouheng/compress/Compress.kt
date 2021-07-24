@@ -65,7 +65,7 @@ class Compress private constructor(
      * Default values is [Config.DEFAULT_BITMAP_RECYCLE].
      *
      * @param autoRecycle whether the source bitmap should be recycled automatically
-     * @return            the compress instance
+     * @return the compress instance
      */
     fun setAutoRecycle(autoRecycle: Boolean): Compress {
         this.autoRecycle = autoRecycle

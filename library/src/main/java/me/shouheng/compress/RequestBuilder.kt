@@ -10,6 +10,20 @@ import kotlinx.coroutines.Dispatchers
 import me.shouheng.compress.suorce.ImageSource
 import kotlin.coroutines.CoroutineContext
 
+interface Algorithm<R> {
+    /** Blocking method used to get the compressed result in current thread. */
+    fun get(): R?
+
+    /** Get the result using kotlin coroutines, for example [Dispatchers.IO]. */
+    suspend fun get(coroutineContext: CoroutineContext): R?
+
+    /** Use RxJava to get the result. */
+    fun asFlowable(): Flowable<R>
+
+    /** Launch the compressor task in [AsyncTask]. */
+    fun launch()
+}
+
 /**
  * The request builder object. Used to build the compress request. It contains many useful methods
  * like [notifyCompressSuccess] etc. This class has two children [AbstractStrategy] and
@@ -17,7 +31,7 @@ import kotlin.coroutines.CoroutineContext
  *
  * @param <R> the result type.
  */
-abstract class RequestBuilder<R> : Handler.Callback {
+abstract class RequestBuilder<R> : Handler.Callback, Algorithm<R> {
 
     private var compressListener: Callback<R>? = null
     private var abstractStrategy: AbstractStrategy? = null
@@ -42,18 +56,6 @@ abstract class RequestBuilder<R> : Handler.Callback {
     internal fun setImageSource(imageSource: ImageSource<*>) {
         this.imageSource = imageSource
     }
-
-    /** Blocking method used to get the compressed result in current thread. */
-    abstract fun get(): R?
-
-    /** Get the result using kotlin coroutines, for example [Dispatchers.IO]. */
-    abstract suspend fun get(coroutineContext: CoroutineContext): R?
-
-    /** Use RxJava to get the result. */
-    abstract fun asFlowable(): Flowable<R>
-
-    /** Launch the compressor task in [AsyncTask]. */
-    abstract fun launch()
 
     override fun handleMessage(msg: Message): Boolean {
         compressListener ?: return false
