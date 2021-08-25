@@ -1,6 +1,6 @@
 package me.shouheng.sample.utils
 
-import android.support.v7.widget.AppCompatSpinner
+import androidx.appcompat.widget.AppCompatSpinner
 import android.view.View
 import android.widget.AdapterView
 

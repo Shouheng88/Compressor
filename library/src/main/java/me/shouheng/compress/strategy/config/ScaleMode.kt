@@ -1,6 +1,6 @@
 package me.shouheng.compress.strategy.config
 
-import android.support.annotation.IntDef
+import androidx.annotation.IntDef
 import me.shouheng.compress.strategy.config.ScaleMode.Companion.SCALE_HEIGHT
 import me.shouheng.compress.strategy.config.ScaleMode.Companion.SCALE_LARGER
 import me.shouheng.compress.strategy.config.ScaleMode.Companion.SCALE_SMALLER

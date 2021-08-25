@@ -1,5 +1,5 @@
 import android.graphics.Bitmap
-import android.support.annotation.RestrictTo
+import androidx.annotation.RestrictTo
 import me.shouheng.compress.AbstractStrategy
 import me.shouheng.compress.Compress
 import me.shouheng.compress.strategy.Strategies
