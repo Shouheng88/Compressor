@@ -2,7 +2,7 @@ package me.shouheng.compress
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.support.annotation.IntRange
+import androidx.annotation.IntRange
 import android.text.TextUtils
 import me.shouheng.compress.listener.CompressListener
 import me.shouheng.compress.naming.CacheNameFactory
