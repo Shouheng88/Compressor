@@ -2,6 +2,7 @@ package me.shouheng.compress
 
 import android.graphics.Bitmap
 import android.os.Handler
+import androidx.annotation.IntRange
 import me.shouheng.compress.request.BitmapBuilder
 import me.shouheng.compress.strategy.config.Config
 import java.io.File
@@ -44,7 +45,7 @@ abstract class AbstractStrategy : RequestBuilder<File>(), Handler.Callback {
         this.format = format
     }
 
-    internal fun setQuality(quality: Int) {
+    internal fun setQuality(@IntRange(from = 0, to = 100) quality: Int) {
         this.quality = quality
     }
 

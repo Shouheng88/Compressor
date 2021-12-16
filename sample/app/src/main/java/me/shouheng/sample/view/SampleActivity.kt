@@ -5,12 +5,12 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
-import automatic
-import concrete
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import me.shouheng.compress.Compress
+import me.shouheng.compress.automatic
+import me.shouheng.compress.concrete
 import me.shouheng.compress.strategy.config.ScaleMode
 import me.shouheng.sample.R
 import me.shouheng.sample.databinding.ActivitySampleBinding
@@ -46,9 +46,9 @@ class SampleActivity : CommonActivity<EmptyViewModel, ActivitySampleBinding>() {
             // Compress and try to get the result on current thread.
             val bitmap = Compress.with(context, srcBitmap)
                 .concrete {
-                    maxHeight = 100f
-                    maxWidth = 120f
-                    scaleMode = ScaleMode.SCALE_LARGER
+                    withMaxHeight(100f)
+                    withMaxWidth(120f)
+                    withScaleMode(ScaleMode.SCALE_LARGER)
                 }
                 .asBitmap()
                 .get()

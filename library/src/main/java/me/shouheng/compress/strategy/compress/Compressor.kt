@@ -18,7 +18,7 @@ import java.util.concurrent.Callable
 import kotlin.coroutines.CoroutineContext
 
 /**
- * The compress algorithm by https://github.com/zetbaitsu/Compressor.
+ * The concrete compress strategy.
  *
  * @author Shouheng Wang
  * @version 2019-05-17

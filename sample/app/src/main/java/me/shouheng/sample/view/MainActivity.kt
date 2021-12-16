@@ -1,24 +1,20 @@
 package me.shouheng.sample.view
 
-import algorithm
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
-import automatic
 import com.bumptech.glide.Glide
-import concrete
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.shouheng.compress.Algorithm
-import me.shouheng.compress.Compress
-import me.shouheng.compress.RequestBuilder
+import me.shouheng.compress.*
 import me.shouheng.compress.listener.CompressListener
 import me.shouheng.compress.naming.CacheNameFactory
 import me.shouheng.compress.strategy.config.ScaleMode
@@ -150,10 +146,10 @@ class MainActivity : CommonActivity<EmptyViewModel, ActivityMainBinding>() {
             .setTargetDir(PathUtils.getExternalPicturesPath())
             .setCompressListener(getCompressListener("Concrete", compressorResultType))
             .concrete {
-                this.config = colorConfig
-                this.maxWidth = 100f
-                this.maxHeight = 100f
-                this.scaleMode = imageScaleMode
+                withBitmapConfig(colorConfig)
+                withMaxWidth(100f)
+                withMaxHeight(100f)
+                withScaleMode(imageScaleMode)
             }
 
         // launch according to given launch type
@@ -186,8 +182,8 @@ class MainActivity : CommonActivity<EmptyViewModel, ActivityMainBinding>() {
             .setCacheNameFactory(getCacheNameFactory())
             .setQuality(80)
             .automatic {
-                ignoreSize = 100
-                copyWhenIgnore = copy
+                withIgnoreSize(100)
+                withCopyWhenIgnore(copy)
             }
 
         when(lubanResultType) {
@@ -234,6 +230,7 @@ class MainActivity : CommonActivity<EmptyViewModel, ActivityMainBinding>() {
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun startForResultTypeBitmap(
         algorithm: Algorithm<Bitmap>,
         path: String,
@@ -274,6 +271,7 @@ class MainActivity : CommonActivity<EmptyViewModel, ActivityMainBinding>() {
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun startForResultTypeFile(
         algorithm: Algorithm<File>,
         algorithmName: String

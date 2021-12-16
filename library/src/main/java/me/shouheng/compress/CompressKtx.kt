@@ -1,76 +1,69 @@
+package me.shouheng.compress
+
 import android.graphics.Bitmap
+import androidx.annotation.IntRange
 import androidx.annotation.RestrictTo
-import me.shouheng.compress.AbstractStrategy
-import me.shouheng.compress.Compress
 import me.shouheng.compress.strategy.Strategies
 import me.shouheng.compress.strategy.compress.Compressor
 import me.shouheng.compress.strategy.config.Config
 import me.shouheng.compress.strategy.config.ScaleMode
 import me.shouheng.compress.strategy.luban.Luban
 
-@DslMarker
-annotation class CompressMaker
+@DslMarker annotation class CompressMaker
 
-//@CompressMaker
-//class CompressBuilder {
-//    var context: Context? = null
-//    var imageFile: File? = null
-//    var imageBitmap: Bitmap? = null
-//    var imageData: ByteArray? = null
-//    var format: Bitmap.CompressFormat = Config.DEFAULT_COMPRESS_FORMAT
-//    var quality: Int = Config.DEFAULT_COMPRESS_QUALITY
-//    var targetDir: String? = null
-//    var autoRecycle: Boolean = Config.DEFAULT_BITMAP_RECYCLE
-//    var cacheNameFactory: CacheNameFactory? = null
-//    var compressListener: CompressListener? = null
-//    var algorithm: AbstractStrategy? = null
-//
-//    fun <T : AbstractStrategy> algorithm(algorithm: T) {
-//        this.algorithm = algorithm
-//    }
-//
-//    fun automatic(init: ConcreteBuilder.() -> Unit) {
-//        val builder = ConcreteBuilder()
-//        builder.apply(init)
-//        algorithm = builder.build()
-//    }
-//
-//    @RestrictTo(RestrictTo.Scope.LIBRARY) fun build(): Compress {
-//        if (context == null) {
-//            throw IllegalArgumentException("Context is required!")
-//        }
-//        if (imageFile == null && imageData == null && imageBitmap == null) {
-//            throw IllegalArgumentException("Source image data (imageFile, imageData or imageBitmap) is required!")
-//        }
-//        imageData?.let {
-//            return Compress.with(context!!, it)
-//        }
-//        imageBitmap?.let {
-//            return Compress.Companion.with(context!!, it)
-//        }
-//        imageFile?.let {
-//            return Compress.Companion.with(context!!, it)
-//        }
-//        throw IllegalStateException("no reachable")
-//    }
-//}
-//
-@CompressMaker class ConcreteBuilder {
-    var format: Bitmap.CompressFormat   = Config.DEFAULT_COMPRESS_FORMAT
-    var quality: Int                    = Config.DEFAULT_COMPRESS_QUALITY
-    var autoRecycle: Boolean            = Config.DEFAULT_BITMAP_RECYCLE
-    var maxWidth: Float                 = Config.COMPRESSOR_DEFAULT_MAX_WIDTH
-    var maxHeight: Float                = Config.COMPRESSOR_DEFAULT_MAX_HEIGHT
-    @ScaleMode var scaleMode: Int       = Config.COMPRESSOR_DEFAULT_SCALE_MODE
-    var config: Bitmap.Config?          = null
-    var ignoreIfSmaller: Boolean        = true
+abstract class AlgorithmBuilder {
+    protected var format: Bitmap.CompressFormat   = Config.DEFAULT_COMPRESS_FORMAT
+    protected var quality: Int                    = Config.DEFAULT_COMPRESS_QUALITY
+    protected var autoRecycle: Boolean            = Config.DEFAULT_BITMAP_RECYCLE
+
+    fun withFormat(format: Bitmap.CompressFormat) {
+        this.format = format
+    }
+
+    fun withQuality(@IntRange(from = 0, to = 100) quality: Int) {
+        this.quality = quality
+    }
+
+    fun withAutoRecycle(autoRecycle: Boolean) {
+        this.autoRecycle = autoRecycle
+    }
+}
+
+@CompressMaker class ConcreteBuilder internal constructor(): AlgorithmBuilder() {
+    private var maxWidth: Float                 = Config.COMPRESSOR_DEFAULT_MAX_WIDTH
+    private var maxHeight: Float                = Config.COMPRESSOR_DEFAULT_MAX_HEIGHT
+    @ScaleMode private var scaleMode: Int       = Config.COMPRESSOR_DEFAULT_SCALE_MODE
+    private var config: Bitmap.Config?          = null
+    private var ignoreIfSmaller: Boolean        = true
+
+    fun withMaxWidth(maxWidth: Float ) {
+        this.maxWidth = maxWidth
+    }
+
+    fun withMaxHeight(maxHeight: Float) {
+        this.maxHeight = maxHeight
+    }
+
+    /** The scale mode. See [ScaleMode]. */
+    fun withScaleMode(@ScaleMode scaleMode: Int) {
+        this.scaleMode = scaleMode
+    }
+
+    fun withBitmapConfig(config: Bitmap.Config) {
+        this.config = config
+    }
+
+    /** Don't compress if the size of source bitmap is smaller than desired size. */
+    fun withIgnoreIfSmaller(ignoreIfSmaller: Boolean) {
+        this.ignoreIfSmaller = ignoreIfSmaller
+    }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY) fun build(): Compressor {
         val compressor = Strategies.compressor()
         compressor.setFormat(format)
         compressor.setQuality(quality)
         compressor.setAutoRecycle(autoRecycle)
-        compressor.setMaxHeight(maxWidth)
+        compressor.setMaxWidth(maxWidth)
         compressor.setMaxHeight(maxHeight)
         compressor.setScaleMode(scaleMode)
         compressor.setIgnoreIfSmaller(ignoreIfSmaller)
@@ -78,12 +71,21 @@ annotation class CompressMaker
     }
 }
 
-@CompressMaker class AutomaticBuilder internal constructor() {
-    var ignoreSize: Int                 = Config.LUBAN_DEFAULT_IGNORE_SIZE // KB
-    var copyWhenIgnore: Boolean         = Config.LUBAN_COPY_WHEN_IGNORE
-    var format: Bitmap.CompressFormat   = Config.DEFAULT_COMPRESS_FORMAT
-    var quality: Int                    = Config.DEFAULT_COMPRESS_QUALITY
-    var autoRecycle: Boolean            = Config.DEFAULT_BITMAP_RECYCLE
+@CompressMaker class AutomaticBuilder internal constructor(): AlgorithmBuilder() {
+    private var ignoreSize: Int                 = Config.LUBAN_DEFAULT_IGNORE_SIZE // KB
+    private var copyWhenIgnore: Boolean         = Config.LUBAN_COPY_WHEN_IGNORE
+
+    fun withIgnoreSize(ignoreSize: Int) {
+        this.ignoreSize = ignoreSize
+    }
+
+    /**
+     * Copy the source bitmap to given destination if it's
+     * smaller than [ignoreSize] and [copyWhenIgnore] is true.
+     */
+    fun withCopyWhenIgnore(copyWhenIgnore: Boolean) {
+        this.copyWhenIgnore = copyWhenIgnore
+    }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY) fun build(): Luban {
         val luban = Strategies.luban()
@@ -121,11 +123,3 @@ fun Compress.concrete(init: ConcreteBuilder.() -> Unit): Compressor {
 fun <T : AbstractStrategy> Compress.algorithm(algorithm: T): T {
     return this.strategy(algorithm)
 }
-
-///** Global compress function. */
-//fun <T : AbstractStrategy> compress(init: CompressBuilder.() -> Unit): T {
-//    val builder = CompressBuilder()
-//    builder.apply(init)
-//    builder.build()
-//    return builder.algorithm!!
-//}
