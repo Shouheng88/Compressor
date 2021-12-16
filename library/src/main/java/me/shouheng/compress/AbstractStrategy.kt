@@ -21,6 +21,7 @@ abstract class AbstractStrategy : RequestBuilder<File>(), Handler.Callback {
     protected var srcWidth: Int = 0
     protected var srcHeight: Int = 0
 
+    /** Call this when you want to get the result as bitmap. */
     fun asBitmap(): BitmapBuilder {
         val builder = BitmapBuilder()
         builder.setAbstractStrategy(this)
@@ -36,7 +37,7 @@ abstract class AbstractStrategy : RequestBuilder<File>(), Handler.Callback {
     }
 
     override fun getBitmap(): Bitmap? {
-        throw IllegalStateException("This #getBitmap() method is not implemented by your strategy.")
+        throw IllegalStateException("The #getBitmap() method is not implemented by your strategy.")
     }
 
     internal fun setFormat(format: Bitmap.CompressFormat) {

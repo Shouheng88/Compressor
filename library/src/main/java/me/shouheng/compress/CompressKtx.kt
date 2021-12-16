@@ -55,16 +55,15 @@ annotation class CompressMaker
 //    }
 //}
 //
-@CompressMaker
-class ConcreteBuilder {
-    var format: Bitmap.CompressFormat = Config.DEFAULT_COMPRESS_FORMAT
-    var quality: Int = Config.DEFAULT_COMPRESS_QUALITY
-    var autoRecycle: Boolean = Config.DEFAULT_BITMAP_RECYCLE
-    var maxWidth: Float = Config.COMPRESSOR_DEFAULT_MAX_WIDTH
-    var maxHeight: Float = Config.COMPRESSOR_DEFAULT_MAX_HEIGHT
-    @ScaleMode var scaleMode: Int = Config.COMPRESSOR_DEFAULT_SCALE_MODE
-    var config: Bitmap.Config? = null
-    var ignoreIfSmaller: Boolean = true
+@CompressMaker class ConcreteBuilder {
+    var format: Bitmap.CompressFormat   = Config.DEFAULT_COMPRESS_FORMAT
+    var quality: Int                    = Config.DEFAULT_COMPRESS_QUALITY
+    var autoRecycle: Boolean            = Config.DEFAULT_BITMAP_RECYCLE
+    var maxWidth: Float                 = Config.COMPRESSOR_DEFAULT_MAX_WIDTH
+    var maxHeight: Float                = Config.COMPRESSOR_DEFAULT_MAX_HEIGHT
+    @ScaleMode var scaleMode: Int       = Config.COMPRESSOR_DEFAULT_SCALE_MODE
+    var config: Bitmap.Config?          = null
+    var ignoreIfSmaller: Boolean        = true
 
     @RestrictTo(RestrictTo.Scope.LIBRARY) fun build(): Compressor {
         val compressor = Strategies.compressor()
@@ -79,13 +78,12 @@ class ConcreteBuilder {
     }
 }
 
-@CompressMaker
-class AutomaticBuilder internal constructor() {
-    var ignoreSize: Int = Config.LUBAN_DEFAULT_IGNORE_SIZE // KB
-    var copyWhenIgnore: Boolean = Config.LUBAN_COPY_WHEN_IGNORE
-    var format: Bitmap.CompressFormat = Config.DEFAULT_COMPRESS_FORMAT
-    var quality: Int = Config.DEFAULT_COMPRESS_QUALITY
-    var autoRecycle: Boolean = Config.DEFAULT_BITMAP_RECYCLE
+@CompressMaker class AutomaticBuilder internal constructor() {
+    var ignoreSize: Int                 = Config.LUBAN_DEFAULT_IGNORE_SIZE // KB
+    var copyWhenIgnore: Boolean         = Config.LUBAN_COPY_WHEN_IGNORE
+    var format: Bitmap.CompressFormat   = Config.DEFAULT_COMPRESS_FORMAT
+    var quality: Int                    = Config.DEFAULT_COMPRESS_QUALITY
+    var autoRecycle: Boolean            = Config.DEFAULT_BITMAP_RECYCLE
 
     @RestrictTo(RestrictTo.Scope.LIBRARY) fun build(): Luban {
         val luban = Strategies.luban()

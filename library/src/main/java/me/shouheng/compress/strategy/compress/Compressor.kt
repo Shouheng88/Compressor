@@ -25,11 +25,11 @@ import kotlin.coroutines.CoroutineContext
  */
 open class Compressor : AbstractStrategy() {
 
-    private var maxWidth: Float = Config.COMPRESSOR_DEFAULT_MAX_WIDTH
-    private var maxHeight: Float = Config.COMPRESSOR_DEFAULT_MAX_HEIGHT
-    @ScaleMode private var scaleMode: Int = Config.COMPRESSOR_DEFAULT_SCALE_MODE
-    private var config: Bitmap.Config? = null
-    private var ignoreIfSmaller: Boolean = true
+    private var maxWidth: Float             = Config.COMPRESSOR_DEFAULT_MAX_WIDTH
+    private var maxHeight: Float            = Config.COMPRESSOR_DEFAULT_MAX_HEIGHT
+    @ScaleMode private var scaleMode: Int   = Config.COMPRESSOR_DEFAULT_SCALE_MODE
+    private var config: Bitmap.Config?      = null
+    private var ignoreIfSmaller: Boolean    = true
 
     override fun getBitmap(): Bitmap? = compressByQuality()
 

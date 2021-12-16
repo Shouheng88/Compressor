@@ -37,6 +37,7 @@ interface ImageSource<T> {
     fun copyTo(dest: File): Boolean = true
 }
 
+/** Image source for [File]. */
 class FileImageSource(private val file: File) : ImageSource<File> {
 
     override fun source(): SourceData<File> = FileSourceData(file)
@@ -77,6 +78,7 @@ class FileImageSource(private val file: File) : ImageSource<File> {
     }
 }
 
+/** Image source for [ByteArray]. */
 class ByteArrayImageSource(private val bytes: ByteArray) : ImageSource<ByteArray> {
 
     override fun source(): SourceData<ByteArray> = ByteArraySourceData(bytes)
@@ -95,6 +97,7 @@ class ByteArrayImageSource(private val bytes: ByteArray) : ImageSource<ByteArray
     }
 }
 
+/** Image source for [Bitmap]. */
 class BitmapImageSource(private val bitmap: Bitmap) : ImageSource<Bitmap> {
 
     override fun source(): SourceData<Bitmap> = BitmapSourceData(bitmap)

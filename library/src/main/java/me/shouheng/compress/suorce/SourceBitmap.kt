@@ -14,26 +14,18 @@ interface SourceData<T> {
 }
 
 /** Abs source data. */
-abstract class AbsSourceData<T>(
-    private val data: T
-) : SourceData<T> {
+abstract class AbsSourceData<T>(private val data: T) : SourceData<T> {
 
     override fun data(): T = data
 
     override fun isBitmap(): Boolean = data is Bitmap
 }
 
-class FileSourceData(
-    file: File
-): AbsSourceData<File>(file)
+class FileSourceData(file: File): AbsSourceData<File>(file)
 
-class ByteArraySourceData(
-    bytes: ByteArray
-): AbsSourceData<ByteArray>(bytes)
+class ByteArraySourceData(bytes: ByteArray): AbsSourceData<ByteArray>(bytes)
 
-class BitmapSourceData(
-    bitmap: Bitmap
-): AbsSourceData<Bitmap>(bitmap)
+class BitmapSourceData(bitmap: Bitmap): AbsSourceData<Bitmap>(bitmap)
 
 /** The origin bitmap. */
 data class SourceBitmap(

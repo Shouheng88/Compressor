@@ -11,6 +11,7 @@ import me.shouheng.compress.suorce.ImageSource
 import kotlin.coroutines.CoroutineContext
 
 interface Algorithm<R> {
+
     /** Blocking method used to get the compressed result in current thread. */
     fun get(): R?
 
@@ -94,11 +95,7 @@ abstract class RequestBuilder<R> : Handler.Callback, Algorithm<R> {
         /** Will be called when start to compress. */
         fun onStart()
 
-        /**
-         * Will be called when finish compress.
-         *y
-         * @param result the compressed image
-         */
+        /** Will be called when finish compress. */
         fun onSuccess(result: T)
 
         /** Will be called when error occurred. */
