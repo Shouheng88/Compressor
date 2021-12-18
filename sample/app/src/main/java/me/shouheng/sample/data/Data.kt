@@ -11,7 +11,7 @@ enum class LaunchType {
 
 /** Compress data source type */
 enum class SourceType {
-    FILE, BYTE_ARRAY, BITMAP
+    FILE, BYTE_ARRAY, BITMAP, URI
 }
 
 /** Result type */
@@ -49,7 +49,8 @@ val scaleModes = arrayOf(
 val sourceTypes = arrayOf(
     SourceType.FILE,
     SourceType.BYTE_ARRAY,
-    SourceType.BITMAP
+    SourceType.BITMAP,
+    SourceType.URI
 )
 
 /** Result type options. */

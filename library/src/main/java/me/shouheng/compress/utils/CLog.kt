@@ -12,7 +12,7 @@ object CLog {
     private const val TAG = "Compressor"
 
     /** Set the log debug mode. */
-    var isDebug: Boolean = false
+    internal var isDebug: Boolean = false
 
     fun d(message: String?) {
         if (isDebug) {

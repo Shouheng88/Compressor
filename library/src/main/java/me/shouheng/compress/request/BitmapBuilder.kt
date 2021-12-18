@@ -10,6 +10,7 @@ import me.shouheng.compress.utils.CLog
 import java.util.concurrent.Callable
 import kotlin.coroutines.CoroutineContext
 
+/** Try to get result as bitmap. */
 class BitmapBuilder : RequestBuilder<Bitmap>() {
 
     override fun get(): Bitmap? {

@@ -10,18 +10,10 @@ import me.shouheng.compress.strategy.luban.Luban
  */
 object Strategies {
 
-    /**
-     * The luban compress strategy, used to get the image for preview.
-     * see https://github.com/Curzibn/Luban for details.
-     *
-     * @return the Luban strategy instance
-     */
+    /** The luban compress strategy, used to get the image for preview.
+     * See https://github.com/Curzibn/Luban for details. */
     fun luban(): Luban = Luban()
 
-    /**
-     * The compressor compress strategy, used to specify the image width height constraints.
-     *
-     * @return the compressor strategy instance
-     */
+    /** The compressor compress strategy, used to specify the image width height constraints. */
     fun compressor(): Compressor = Compressor()
 }

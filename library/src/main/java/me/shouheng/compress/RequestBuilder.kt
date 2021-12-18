@@ -7,10 +7,13 @@ import android.os.Looper
 import android.os.Message
 import io.reactivex.Flowable
 import kotlinx.coroutines.Dispatchers
-import me.shouheng.compress.suorce.ImageSource
+import me.shouheng.compress.strategy.IImageSource
+import me.shouheng.compress.utils.CLog
 import kotlin.coroutines.CoroutineContext
 
+/** The compress algorithm. */
 interface Algorithm<R> {
+
     /** Blocking method used to get the compressed result in current thread. */
     fun get(): R?
 
@@ -33,36 +36,34 @@ interface Algorithm<R> {
  */
 abstract class RequestBuilder<R> : Handler.Callback, Algorithm<R> {
 
-    private var compressListener: Callback<R>? = null
+    private var compressListener: Callback<R>?      = null
     private var abstractStrategy: AbstractStrategy? = null
-    protected var imageSource: ImageSource<*>? = null
+    protected var imageSource: IImageSource<*>?     = null
 
     private val handler = Handler(Looper.getMainLooper(), this)
 
-    /**
-     * Get bitmap from given strategy. The strategy must implement this method.
-     * Mainly this method is used to get bitmap in [RequestBuilder]
-     * like [me.shouheng.compress.request.BitmapBuilder] to get bitmap from real compressor
-     * like luban and compressor and transform the bitmap to required type.
-     *
-     * @return the bitmap
-     */
-    open fun getBitmap(): Bitmap? {
-        abstractStrategy?: throw IllegalStateException("The real compress strategy is null.")
-        return abstractStrategy!!.getBitmap()
-    }
+    open fun getBitmap(): Bitmap? = abstractStrategy?.getBitmap()
 
     /** Set the image source. */
-    internal fun setImageSource(imageSource: ImageSource<*>) {
+    internal fun setImageSource(imageSource: IImageSource<*>) {
         this.imageSource = imageSource
     }
 
     override fun handleMessage(msg: Message): Boolean {
         compressListener ?: return false
         when (msg.what) {
-            MSG_COMPRESS_START -> compressListener?.onStart()
-            MSG_COMPRESS_SUCCESS -> compressListener?.onSuccess(msg.obj as R)
-            MSG_COMPRESS_ERROR -> compressListener?.onError(msg.obj as Throwable)
+            MSG_COMPRESS_START   -> {
+                CLog.i("Compress process started!")
+                compressListener?.onStart()
+            }
+            MSG_COMPRESS_SUCCESS -> {
+                CLog.i("Compress process succeed!")
+                compressListener?.onSuccess(msg.obj as R)
+            }
+            MSG_COMPRESS_ERROR   -> {
+                CLog.i("Compress process failed, due [${(msg.obj as Throwable).message}]!")
+                compressListener?.onError(msg.obj as Throwable)
+            }
             else -> { /* noop */ }
         }
         return false
@@ -94,11 +95,7 @@ abstract class RequestBuilder<R> : Handler.Callback, Algorithm<R> {
         /** Will be called when start to compress. */
         fun onStart()
 
-        /**
-         * Will be called when finish compress.
-         *y
-         * @param result the compressed image
-         */
+        /** Will be called when finish compress. */
         fun onSuccess(result: T)
 
         /** Will be called when error occurred. */

@@ -9,82 +9,54 @@ import kotlinx.coroutines.withContext
 import me.shouheng.compress.AbstractStrategy
 import me.shouheng.compress.strategy.config.Config
 import me.shouheng.compress.strategy.config.ScaleMode
-import me.shouheng.compress.utils.CImageUtils
 import me.shouheng.compress.utils.CLog
+import me.shouheng.compress.utils.isEmpty
+import me.shouheng.compress.utils.isNotEmpty
+import me.shouheng.compress.utils.rotate
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.Callable
 import kotlin.coroutines.CoroutineContext
 
-/**
- * The compress algorithm by https://github.com/zetbaitsu/Compressor.
- *
- * @author Shouheng Wang
- * @version 2019-05-17
- */
+/** The concrete compress algorithm. */
 open class Compressor : AbstractStrategy() {
 
-    private var maxWidth: Float = Config.COMPRESSOR_DEFAULT_MAX_WIDTH
-    private var maxHeight: Float = Config.COMPRESSOR_DEFAULT_MAX_HEIGHT
-    @ScaleMode private var scaleMode: Int = Config.COMPRESSOR_DEFAULT_SCALE_MODE
-    private var config: Bitmap.Config? = null
-    private var ignoreIfSmaller: Boolean = true
+    private var maxWidth: Float             = Config.COMPRESSOR_DEFAULT_MAX_WIDTH
+    private var maxHeight: Float            = Config.COMPRESSOR_DEFAULT_MAX_HEIGHT
+    @ScaleMode private var scaleMode: Int   = Config.COMPRESSOR_DEFAULT_SCALE_MODE
+    private var config: Bitmap.Config?      = null
+    private var ignoreIfSmaller: Boolean    = true
 
-    override fun getBitmap(): Bitmap? = compressByQuality()
+    override fun getBitmap(): Bitmap? = compressByScaleAndQuality()
 
     /*--------------------------------------- public methods ------------------------------------------*/
 
-    /**
-     * Set the max width of compressed image.
-     *
-     * @param maxWidth the max width in pixels.
-     * @return the compressor instance.
-     */
+    /** Set the max width of compressed image in pixels. */
     fun setMaxWidth(maxWidth: Float): Compressor {
         this.maxWidth = maxWidth
         return this
     }
 
-    /**
-     * Set the max height of compressed image.
-     *
-     * @param maxHeight the max height in pixels.
-     * @return the compressor instance.
-     */
+    /** Set the max height of compressed image in pixels. */
     fun setMaxHeight(maxHeight: Float): Compressor {
         this.maxHeight = maxHeight
         return this
     }
 
-    /**
-     * Set the scale mode when the destination image ratio differ from the original original.
-     *
-     * @param scaleMode the scale mode.
-     * @return the compressor instance.
-     * @see ScaleMode for details ab out this field
-     */
+    /** Set the scale mode when the destination image ratio differ from the original original. */
     fun setScaleMode(@ScaleMode scaleMode: Int): Compressor {
         this.scaleMode = scaleMode
         return this
     }
 
-    /**
-     * Set the image configuration for bitmap: [android.graphics.Bitmap.Config].
-     *
-     * @param config the config
-     * @return the compress instance
-     * @see android.graphics.Bitmap.Config
-     */
+    /** Set the image configuration for bitmap: [android.graphics.Bitmap.Config]. */
     fun setConfig(config: Bitmap.Config): Compressor {
         this.config = config
         return this
     }
 
-    /**
-     * Action when the current size is smaller than required size.
-     * If the [ignoreIfSmaller] is true, it will ignore the request and return the origin bitmap.
-     */
+    /** Don't compress if the desired bitmap is smaller than desired size. */
     fun setIgnoreIfSmaller(ignoreIfSmaller: Boolean): Compressor {
         this.ignoreIfSmaller = ignoreIfSmaller
         return this
@@ -115,7 +87,8 @@ open class Compressor : AbstractStrategy() {
                 if (succeed) {
                     notifyCompressSuccess(outFile!!)
                 } else {
-                    notifyCompressError(Exception("Failed to compress image, either caused by OOM or other problems."))
+                    notifyCompressError(Exception("Failed to compress image, " +
+                            "either caused by OOM or other problems."))
                 }
                 return@Callable Flowable.just(outFile)
             } catch (e: Exception) {
@@ -134,7 +107,8 @@ open class Compressor : AbstractStrategy() {
                 if (succeed) {
                     notifyCompressSuccess(outFile!!)
                 } else {
-                    notifyCompressError(Exception("Failed to compress image, either caused by OOM or other problems."))
+                    notifyCompressError(Exception("Failed to compress image, " +
+                            "either caused by OOM or other problems."))
                 }
             } catch (e: Exception) {
                 notifyCompressError(e)
@@ -227,9 +201,9 @@ open class Compressor : AbstractStrategy() {
     /** Compress bitmap and save it to target file. */
     private fun compressAndWrite(): Boolean {
         val bitmap = compressByScale()
-        if (!CImageUtils.isEmptyBitmap(bitmap)) {
+        if (bitmap.isNotEmpty()) {
             val fos = FileOutputStream(outFile)
-            bitmap!!.compress(format, quality, fos)
+            bitmap?.compress(format, quality, fos)
             fos.flush()
             fos.close()
         } else {
@@ -239,11 +213,11 @@ open class Compressor : AbstractStrategy() {
     }
 
     /** Compress by quality. The bitmap will be compressed by scale first. */
-    private fun compressByQuality(): Bitmap? {
+    private fun compressByScaleAndQuality(): Bitmap? {
         val bitmap = compressByScale()
-        if (CImageUtils.isEmptyBitmap(bitmap)) return null
+        if (bitmap.isEmpty()) return null
         val baos = ByteArrayOutputStream()
-        bitmap!!.compress(format, quality, baos)
+        bitmap?.compress(format, quality, baos)
         val bytes = baos.toByteArray()
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
     }
@@ -262,9 +236,7 @@ open class Compressor : AbstractStrategy() {
 
         // ignore if the origin size is smaller then required size
         if (ignoreIfSmaller && (reqWidth > srcWidth || reqWidth > srcHeight)) {
-            return origin?.let {
-                imageSource?.rotation(it)
-            }
+            return getRotatedBitmap(origin)
         }
 
         // failed to create scaled bitmap or get the origin bitmap, return null directly.
@@ -276,14 +248,18 @@ open class Compressor : AbstractStrategy() {
         val matrix = Matrix().apply { setScale(ratioX, ratioY) }
         val result = Bitmap.createBitmap(origin, 0, 0, origin.width, origin.height, matrix, true)
 
-        return imageSource?.rotation(result)
+        return getRotatedBitmap(result)
+    }
+
+    /** Get rotated image bitmap if necessary. */
+    private fun getRotatedBitmap(bitmap: Bitmap?): Bitmap? {
+        if (bitmap == null) return bitmap
+        val rotation = imageSource?.getRotation()
+        return if (rotation != null && rotation != 0) bitmap.rotate(rotation) else bitmap
     }
 
     /** Get the origin bitmap based on the source bitmap type. */
     private fun getOriginBitmap(reqWidth: Int, reqHeight: Int): Bitmap? {
-        val sourceData = imageSource!!.source()
-        if (sourceData.isBitmap())
-            return sourceData.data() as Bitmap
         val options = BitmapFactory.Options()
         options.inSampleSize = calculateInSampleSize(reqWidth, reqHeight)
         options.inJustDecodeBounds = false
@@ -291,6 +267,6 @@ open class Compressor : AbstractStrategy() {
         options.inPurgeable = true
         options.inInputShareable = true
         options.inTempStorage = ByteArray(16 * 1024)
-        return imageSource!!.bitmap(options).bitmap
+        return imageSource?.getOriginBitmapByOptions(options)
     }
 }
