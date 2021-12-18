@@ -1,4 +1,4 @@
-package me.shouheng.sample.utils
+package me.shouheng.sample.custom
 
 import me.shouheng.compress.strategy.SimpleStrategy
 

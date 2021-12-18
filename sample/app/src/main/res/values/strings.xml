@@ -55,6 +55,7 @@
         <item>File</item>
         <item>ByteArray</item>
         <item>Bitmap</item>
+        <item>Uri</item>
     </array>
 
     <array name="result_type">

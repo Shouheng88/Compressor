@@ -18,8 +18,10 @@ import me.shouheng.compress.*
 import me.shouheng.compress.listener.CompressListener
 import me.shouheng.compress.naming.CacheNameFactory
 import me.shouheng.compress.strategy.config.ScaleMode
-import me.shouheng.compress.utils.CImageUtils
+import me.shouheng.compress.utils.orientation
+import me.shouheng.compress.utils.rotate
 import me.shouheng.sample.R
+import me.shouheng.sample.custom.AlwaysHalfAlgorithm
 import me.shouheng.sample.data.*
 import me.shouheng.sample.databinding.ActivityMainBinding
 import me.shouheng.sample.utils.*
@@ -204,8 +206,7 @@ class MainActivity : CommonActivity<EmptyViewModel, ActivityMainBinding>() {
 
     private fun compressByCustom() {
         binding.ivOriginal.tag?.let {
-            val file = File(it as String)
-            Compress.with(context, file)
+            getCompress(it as String)
                 .setCompressListener(getCompressListener("Half", ResultType.FILE))
                 .setQuality(80)
                 .algorithm(AlwaysHalfAlgorithm())
@@ -226,6 +227,9 @@ class MainActivity : CommonActivity<EmptyViewModel, ActivityMainBinding>() {
             SourceType.BITMAP -> {
                 val bitmap = BitmapFactory.decodeFile(path)
                 Compress.with(this, bitmap)
+            }
+            SourceType.URI -> {
+                Compress.with(this, File(path).uri(context))
             }
         }
     }
@@ -316,8 +320,8 @@ class MainActivity : CommonActivity<EmptyViewModel, ActivityMainBinding>() {
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = false
         var bitmap = BitmapFactory.decodeFile(filePath, options)
-        val angle = CImageUtils.getImageAngle(File(filePath))
-        if (angle != 0) bitmap = CImageUtils.rotateBitmap(bitmap, angle)
+        val angle = File(filePath).orientation()
+        bitmap = bitmap.rotate(angle)
         binding.ivOriginal.setImageBitmap(bitmap)
         val size = bitmap.byteCount
         binding.tvOriginal.text = "Original:\nwidth: ${bitmap.width}\nheight:${bitmap.height}\nsize:$size"
@@ -337,9 +341,7 @@ class MainActivity : CommonActivity<EmptyViewModel, ActivityMainBinding>() {
     }
 
     private fun displayResult(bitmap: Bitmap?) {
-        if (bitmap == null) {
-            return
-        }
+        bitmap ?: return
         val actualWidth = bitmap.width
         val actualHeight = bitmap.height
         binding.ivResult.setImageBitmap(bitmap)
