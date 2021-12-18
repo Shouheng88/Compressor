@@ -16,14 +16,20 @@ abstract class AlgorithmBuilder {
     protected var quality: Int                    = Config.DEFAULT_COMPRESS_QUALITY
     protected var autoRecycle: Boolean            = Config.DEFAULT_BITMAP_RECYCLE
 
+    /** Desired bitmap format. */
     fun withFormat(format: Bitmap.CompressFormat) {
         this.format = format
     }
 
+    /** Desired image quality. */
     fun withQuality(@IntRange(from = 0, to = 100) quality: Int) {
         this.quality = quality
     }
 
+    @Deprecated(
+        "The auto-recycle is not necessary any more.",
+        ReplaceWith("this.autoRecycle = autoRecycle")
+    )
     fun withAutoRecycle(autoRecycle: Boolean) {
         this.autoRecycle = autoRecycle
     }

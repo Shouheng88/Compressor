@@ -8,7 +8,7 @@ object DefaultNameFactory : CacheNameFactory {
 
     override fun getFileName(format: Bitmap.CompressFormat): String {
         return (System.currentTimeMillis() + Random().nextInt()).toString() + when(format) {
-            Bitmap.CompressFormat.PNG -> ".png"
+            Bitmap.CompressFormat.PNG  -> ".png"
             Bitmap.CompressFormat.JPEG -> ".jpeg"
             Bitmap.CompressFormat.WEBP -> ".webp"
         }

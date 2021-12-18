@@ -4,7 +4,7 @@ import android.os.AsyncTask
 import io.reactivex.Flowable
 import me.shouheng.compress.strategy.SimpleStrategy
 import me.shouheng.compress.strategy.config.Config
-import me.shouheng.compress.suorce.FileImageSource
+import me.shouheng.compress.strategy.FileImageSource
 import java.io.File
 import java.io.IOException
 import kotlin.math.ceil
@@ -18,7 +18,7 @@ import kotlin.math.ceil
 class Luban : SimpleStrategy() {
 
     /** The image won't be compressed if the image size smaller than this value (KB). */
-    private var ignoreSize: Int = Config.LUBAN_DEFAULT_IGNORE_SIZE // KB
+    private var ignoreSize: Int         = Config.LUBAN_DEFAULT_IGNORE_SIZE // KB
 
     /** Should copy the image if the size of original image is less than [ignoreSize]. */
     private var copyWhenIgnore: Boolean = Config.LUBAN_COPY_WHEN_IGNORE
@@ -66,18 +66,18 @@ class Luban : SimpleStrategy() {
     }
 
     override fun asFlowable(): Flowable<File> {
-        return if (imageSource?.ignore(ignoreSize) == false) {
+        return if (imageSource?.shouldIgnoreForSize(ignoreSize) == false) {
             super.asFlowable()
         } else {
             // don't need to compress.
             if (copyWhenIgnore) {
                 Flowable.defer<File> {
                     notifyCompressStart()
-                    if (imageSource?.copyTo(outFile!!) == true) {
+                    if (imageSource?.copyTo(outFile!!, format, quality) == true) {
                         notifyCompressSuccess(outFile!!)
                         Flowable.just(outFile)
                     } else {
-                        val e = IOException("Failed when copying file...")
+                        val e = IOException("Failed when copying file ...")
                         notifyCompressError(e)
                         Flowable.error(e)
                     }
@@ -86,8 +86,8 @@ class Luban : SimpleStrategy() {
                 Flowable.defer {
                     (imageSource as? FileImageSource)?.let {
                         notifyCompressStart()
-                        notifyCompressSuccess(it.source().data())
-                        Flowable.just(it.source().data())
+                        notifyCompressSuccess(it.file)
+                        Flowable.just(it.file)
                     }
                 }
             }
@@ -95,22 +95,22 @@ class Luban : SimpleStrategy() {
     }
 
     override fun launch() {
-        if (imageSource?.ignore(ignoreSize) == false) {
+        if (imageSource?.shouldIgnoreForSize(ignoreSize) == false) {
             super.launch()
         } else {
             if (copyWhenIgnore) {
                 AsyncTask.SERIAL_EXECUTOR.execute {
                     notifyCompressStart()
-                    if (imageSource?.copyTo(outFile!!) == true) {
+                    if (imageSource?.copyTo(outFile!!, format, quality) == true) {
                         notifyCompressSuccess(outFile!!)
                     } else {
-                        notifyCompressError(IOException("Failed when copying file..."))
+                        notifyCompressError(IOException("Failed when copying file ..."))
                     }
                 }
             } else {
                 (imageSource as? FileImageSource)?.let {
                     notifyCompressStart()
-                    notifyCompressSuccess(it.source().data())
+                    notifyCompressSuccess(it.file)
                 }
             }
         }
